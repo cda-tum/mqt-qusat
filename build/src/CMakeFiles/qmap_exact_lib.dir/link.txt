@@ -1,0 +1,2 @@
+"/usr/bin/gcc-ar-9" cr libqmap_exact_lib.a  CMakeFiles/qmap_exact_lib.dir/utils.cpp.o CMakeFiles/qmap_exact_lib.dir/Architecture.cpp.o CMakeFiles/qmap_exact_lib.dir/Mapper.cpp.o CMakeFiles/qmap_exact_lib.dir/exact/ExactMapper.cpp.o CMakeFiles/qmap_exact_lib.dir/Encodings.cpp.o
+"/usr/bin/gcc-ranlib-9" libqmap_exact_lib.a

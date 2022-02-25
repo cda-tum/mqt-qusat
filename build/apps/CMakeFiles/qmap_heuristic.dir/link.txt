@@ -1,0 +1,1 @@
+/usr/bin/c++  -O3 -DNDEBUG   CMakeFiles/qmap_heuristic.dir/heuristic_app.cpp.o  -o qmap_heuristic  ../src/libqmap_heuristic_lib.a /usr/lib/x86_64-linux-gnu/libboost_program_options.so.1.71.0 ../src/extern/qfr/src/libqfr.a 

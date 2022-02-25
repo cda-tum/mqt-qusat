@@ -1,0 +1,10 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/luca/Documents/codeRepos/qsatencoder/build/src/extern/qfr/src/CMakeFiles/_CMakeLTOTest-CXX/src/foo.cpp
+
