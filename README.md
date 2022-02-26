@@ -1,4 +1,4 @@
-# A Satisfiability construction algorithm for Clifford quantum Circuits written in C++
+# A Satisfiability Formulation Construction Algorithm for Clifford Quantum Circuits Written in C++
 This project is a proof-of-principle implementation corresponding to the paper
 [[1]]()
 L. Berent, L. Burgholzer, and R. Wille. Towards a Satisfiability Encoding for Quantum Circuits. 2022.
@@ -54,4 +54,4 @@ This will produce several .json files containing the experimental data. The pyth
 to plot the respective data.
 
 Note that as we use a randomized procedure to generate input data the exact experimental data will slightly vary everytime the benchmarks are run.
-The experimental data used in the paper is available in the directory /test/results.
+The experimental data used in the paper is available in the directory `/test/results`.
