@@ -31,24 +31,24 @@ Note the `--recurse-submodules` flag. It is required to also clone all the requi
 QMAP toolkit https://github.com/iic-jku/qmap are needed.
 If you happen to forget passing the flag on your initial clone, you can initialize all the submodules by executing `git submodule update --init --recursive` in the main project directory.
 
-The project use CMake as the main build configuration tool. Building a project using CMake is a two-stage process. First, CMake needs to be *configured* by calling
+The Benchmarks are automated using the gtest framework. The project uses CMake as the main build configuration tool. Building a project using CMake is a two-stage process. First, CMake needs to be *configured* by calling
 ```shell 
-cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=/path/to/g++ -DBUILD_QMAP_TESTS=ON -DBINDINGS=ON -DZ3_ROOT=/path/to/z3/
 ```
 This tells CMake to search the current directory `.` (passed via `-S`) for a *CMakeLists.txt* file and process it into a directory `build` (passed via `-B`).
-The flag `-DCMAKE_BUILD_TYPE=Release` tells CMake to configure a *Release* build (as opposed to, e.g., a *Debug* build).
+The flag `-DCMAKE_BUILD_TYPE=Debug` and `-DBUILD_QMAP_TESTS=ON` tell CMake to configure a *Debug* build which is needed for the test.
 
-After configuring with CMake, the project can be built by calling
+After configuring with CMake, the benchmarks can be built by calling
 ```shell
-cmake --build build --config Release
+cmake --build build/ --target qsatencoder_satencoder_test
 ```
-This tries to build the project in the `build` directory (passed via `--build`).
+This tries to build the benchmark project in the `build` directory (passed via `--build`).
 Some operating systems and developer environments explicitly require a configuration to be set, which is why the `--config` flag is also passed to the build command. The flag `--parallel <NUMBER_OF_THREADS>` may be added to trigger a parallel build.
 
 ## Usage
-After building the project, the benchmarks can be run by executing the corresponding test executable `qsatencoder_satencoder_test`.
+After building the project, the benchmarks can be run by executing the corresponding test executable `qsatencoder_satencoder_test` in the build directory `build`.
 ```
-qsatencoder_satencoder_test --gtest_filter=SatEncoderBenchmarking.*:SatEncoderBenchmarking/*.*:SatEncoderBenchmarking.*/*:*/SatEncoderBenchmarking.*/*:*/SatEncoderBenchmarking/*.*
+./build/qsatencoder_satencoder_test --gtest_filter=SatEncoderBenchmarking.*:SatEncoderBenchmarking/*.*:SatEncoderBenchmarking.*/*:*/SatEncoderBenchmarking.*/*:*/SatEncoderBenchmarking/*.*
 ```
 This will produce several .json files containing the experimental data. The python script `/test/results/visualizer.py` can be used
 to plot the respective data.
