@@ -1,2 +1,0 @@
-"/usr/bin/gcc-ar-9" cr libqmap_heuristic_lib.a  CMakeFiles/qmap_heuristic_lib.dir/utils.cpp.o CMakeFiles/qmap_heuristic_lib.dir/Architecture.cpp.o CMakeFiles/qmap_heuristic_lib.dir/Mapper.cpp.o CMakeFiles/qmap_heuristic_lib.dir/heuristic/HeuristicMapper.cpp.o
-"/usr/bin/gcc-ranlib-9" libqmap_heuristic_lib.a

@@ -1,2 +1,0 @@
-"/usr/bin/gcc-ar-9" cr libqmap_satencoder_lib.a  CMakeFiles/qmap_satencoder_lib.dir/satencoder/SatEncoder.cpp.o
-"/usr/bin/gcc-ranlib-9" libqmap_satencoder_lib.a
