@@ -9,6 +9,7 @@ extraction:
     prepare:
       packages:
         - libz3-dev
+        - libboost-all-dev
     configure:
       command:
         - cmake -S . -B build -DBUILD_QUSAT_TESTS=ON -DBUILD_QFR_TESTS=ON -DBUILD_DD_PACKAGE_TESTS=ON -DBINDINGS=ON
