@@ -15,6 +15,9 @@ env:
   BUILD_TYPE:                 Release
   CMAKE_BUILD_PARALLEL_LEVEL: 2
   Z3_GIT_TAG:                 z3-4.8.14
+  BOOST_VERSION_MAJOR:        1
+  BOOST_VERSION_MINOR:        76
+  BOOST_VERSION_PATCH:        0
 
 jobs:
   codestyle:
@@ -43,7 +46,7 @@ jobs:
           python-version: '3.9'
 
       - name: Installing boost
-        run:  sudo apt-get install -y libboost-all-dev
+        run:  sudo apt-get update && sudo apt-get -y install libboost-all-dev
 
       - name: Install Z3
         run:  python -m pip install z3-solver
@@ -87,11 +90,11 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Installing Z3
+      - name: Installing Boost and Z3
         run:  brew install boost z3
 
       - name: Configure CMake
-        run:  cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build" -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DBUILD_QMAP_TESTS=ON
+        run:  cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build" -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DBUILD_QUSAT_TESTS=ON
 
       - name: Build
         run:  |
@@ -124,6 +127,13 @@ jobs:
               git clone --branch $Z3_GIT_TAG --depth 1 https://github.com/Z3Prover/z3.git
               cmake -S z3 -B z3/build -DCMAKE_BUILD_TYPE=$BUILD_TYPE -G "Visual Studio 17 2022" -A x64 -DZ3_BUILD_LIBZ3_SHARED=FALSE -DZ3_BUILD_EXECUTABLE=False -DZ3_BUILD_TEST_EXECUTABLES=False
               cmake --build z3/build --config $BUILD_TYPE
+
+      - name: Install boost
+        uses: MarkusJx/install-boost@v2.1.0
+        id:   install-boost
+        with:
+          boost_version:    ${{ env.BOOST_VERSION_MAJOR }}.${{ env.BOOST_VERSION_MINOR }}.${{ env.BOOST_VERSION_PATCH }}
+          platform_version: 2019
 
       - name: Configure CMake
         run:  cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build" -DCMAKE_BUILD_TYPE=$BUILD_TYPE -T "ClangCl" -DZ3_ROOT=z3/build -DBUILD_QUSAT_TESTS=ON
