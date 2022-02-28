@@ -19,6 +19,12 @@ target_link_libraries(${PROJECT_NAME} PUBLIC JKQ::qfr)
 # add z3 SMT solver
 target_link_libraries(${PROJECT_NAME} PUBLIC z3::z3lib)
 
+# add header-only part of the Boost library
+set(Boost_USE_MULTITHREADED ON)
+set(Boost_USE_STATIC_RUNTIME OFF)
+find_package(Boost 1.71 REQUIRED)
+target_link_libraries(${PROJECT_NAME} PUBLIC Boost::boost)
+
 # enable interprocedural optimization if it is supported
 include(CheckIPOSupported)
 check_ipo_supported(RESULT ipo_supported)
