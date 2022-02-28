@@ -1,5 +1,6 @@
 ignore:
   - "extern/**/*"
+  - "test/*.cpp"
 
 coverage:
   range:     60..90

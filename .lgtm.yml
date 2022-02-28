@@ -1,0 +1,17 @@
+path_classifiers:
+  test:
+    - test
+  library:
+    - extern/qfr
+
+extraction:
+  cpp:
+    prepare:
+      packages:
+        - libz3-dev
+    configure:
+      command:
+        - cmake -S . -B build -DBUILD_QUSAT_TESTS=ON -DBUILD_QFR_TESTS=ON -DBUILD_DD_PACKAGE_TESTS=ON -DBINDINGS=ON
+    index:
+      build_command:
+        - cmake --build build --parallel 2

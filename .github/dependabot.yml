@@ -7,8 +7,8 @@ updates:
     # Check the submodules for updates every week
     schedule:
       interval: "weekly"
-      day: "wednesday"
-      time: "06:00"
+      day:      "friday"
+      time:     "06:00"
     assignees:
       - "burgholzer"
 
@@ -19,7 +19,7 @@ updates:
     # Check for updates to GitHub Actions every week
     schedule:
       interval: "weekly"
-      day: "wednesday"
-      time: "06:00"
+      day:      "friday"
+      time:     "06:00"
     assignees:
       - "burgholzer"
