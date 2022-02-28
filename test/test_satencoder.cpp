@@ -95,7 +95,7 @@ TEST_F(SatEncoderBenchmarking, GrowingNrOfQubitsForFixedDepth) { // scaling wrt 
             auto               t  = std::time(nullptr);
             auto               tm = *std::localtime(&t);
             oss << std::put_time(&tm, "%d-%m-%Y");
-            auto        filename = oss.str();
+            auto filename = oss.str();
 
             std::ofstream outfile(benchmarkFilesPath + "QB-" + std::to_string(depth) + "-" + filename + ".json");
             outfile << "{ \"benchmarks\" : [";
@@ -128,7 +128,7 @@ TEST_F(SatEncoderBenchmarking, GrowingCircuitSizeForFixedQubits) { // scaling wr
         // std::vector<std::size_t> qubits = {5, 20, 65, 127};
         std::vector<std::size_t> qubits = {5, 20};
         for (unsigned long nrOfQubits: qubits) {
-            std::size_t        depth    = 1U;
+            std::size_t depth = 1U;
             // Paper Evaluation:
             // std::size_t        maxDepth = 500;
             std::size_t        maxDepth = 50U;
@@ -138,7 +138,7 @@ TEST_F(SatEncoderBenchmarking, GrowingCircuitSizeForFixedQubits) { // scaling wr
             auto               t  = std::time(nullptr);
             auto               tm = *std::localtime(&t);
             oss << std::put_time(&tm, "%d-%m-%Y");
-            auto        filename = oss.str();
+            auto filename = oss.str();
 
             std::ofstream outfile(benchmarkFilesPath + "CS-" + std::to_string(nrOfQubits) + "-" + filename + ".json");
             outfile << "{ \"benchmarks\" : [";
@@ -168,7 +168,7 @@ TEST_F(SatEncoderBenchmarking, GrowingCircuitSizeForFixedQubitsGenerators) { // 
     try {
         std::vector<std::size_t> qubits = {1, 2, 3};
         for (unsigned long nrOfQubits: qubits) {
-            std::size_t        depth    = 1U;
+            std::size_t depth = 1U;
             // Paper Evaluation:
             // std::size_t        maxDepth = 100;
             std::size_t        maxDepth = 10U;
@@ -178,7 +178,7 @@ TEST_F(SatEncoderBenchmarking, GrowingCircuitSizeForFixedQubitsGenerators) { // 
             auto               t  = std::time(nullptr);
             auto               tm = *std::localtime(&t);
             oss << std::put_time(&tm, "%d-%m-%Y");
-            auto        filename = oss.str();
+            auto filename = oss.str();
 
             std::ofstream outfile(benchmarkFilesPath + "G-" + std::to_string(nrOfQubits) + "-" + filename + ".json");
             outfile << "{ \"benchmarks\" : [";
@@ -208,9 +208,9 @@ TEST_F(SatEncoderBenchmarking, EquivalenceCheckingGrowingNrOfQubits) { // Equiva
     try {
         // Paper Evaluation:
         // const std::size_t  depth         = 1000;
-        const std::size_t  depth         = 100;
-        std::size_t        qubitCnt      = 4;
-        const std::size_t  stepsize      = 4;
+        const std::size_t depth    = 100;
+        std::size_t       qubitCnt = 4;
+        const std::size_t stepsize = 4;
         // Paper Evaluation:
         // const std::size_t  maxNrOfQubits = 128;
         const std::size_t  maxNrOfQubits = 16;
@@ -224,7 +224,7 @@ TEST_F(SatEncoderBenchmarking, EquivalenceCheckingGrowingNrOfQubits) { // Equiva
         auto               t  = std::time(nullptr);
         auto               tm = *std::localtime(&t);
         oss << std::put_time(&tm, "%d-%m-%Y");
-        auto        timestamp = oss.str();
+        auto timestamp = oss.str();
 
         std::ofstream outfile(benchmarkFilesPath + "EC-" + timestamp + ".json");
         outfile << "{ \"benchmarks\" : [";
