@@ -1,15 +1,38 @@
-# A Satisfiability Formulation Construction Algorithm for Clifford Quantum Circuits Written in C++
-This project is a proof-of-principle implementation corresponding to the paper
-[[1]]()
-L. Berent, L. Burgholzer, and R. Wille. Towards a Satisfiability Encoding for Quantum Circuits. 2022.
+[![GitHub Workflow Status](https://img.shields.io/github/workflow/status/lucasberent/qsatencoder/CI?logo=github&style=plastic)](https://github.com/lucasberent/qsatencoder/actions?query=workflow%3A%22CI%22)
+[![Codecov branch](https://img.shields.io/codecov/c/github/lucasberent/qsatencoder/master?label=codecov&logo=codecov&style=plastic)](https://codecov.io/gh/lucasberent/qsatencoder)
+![GitHub](https://img.shields.io/github/license/lucasberent/qsatencoder?style=plastic)
+[![toolset: JKQ](https://img.shields.io/static/v1?label=toolset&message=MQT&color=blue&style=plastic)](https://github.com/lucasberent/qsatencoder)
+
+# MQT QuSAT - A Tool for Utilizing SAT in Quantum Computing Written in C++
+
+QuSAT is part of the Munich Quantum Toolkit (MQT) and provides methods for utilizing satisfiability techniques in quantum computing based on methods proposed in:
+
+ - [[1]](#towards-a-satisfiability-encoding-for-quantum-circuits) L. Berent, L. Burgholzer, and R. Wille. Towards a Satisfiability Encoding for Quantum Circuits. 2022.
+
+The project is in active development and can currently be used to 
+ - Encode Clifford circuits in SAT
+ - Check the equivalence of Clifford circuits using SAT
+ 
+If you have any questions, feel free to contact us via [iic-quantum@jku.at](mailto:iic-quantum@jku.at) or by creating an issue on [GitHub](https://github.com/lucasberent/qsatencoder/issues).
+
+## Towards a Satisfiability Encoding for Quantum Circuits
+
+The results from the paper can be reproduced by first building the project as described below and then executing the resulting `qusat_test` executable in the build directory.
+In order to replicate the full range of results, the `test/test_satencoder.cpp` needs to be modified before building the project.
+The corresponding lines to be changed are marked with a `// Paper Evaluation:` comment.
+
+Running the executable, produces several `.json` files containing the experimental data. The python script `/results/visualizer.py` can be used
+to plot the respective data.
+
+Note that, as we use a randomized procedure to generate input data, the exact experimental data will slightly vary everytime the benchmarks are run.
+The experimental data used in the paper is available in `/results` directory.
+
 ## System Requirements
 
-The implementation should be compatible with any current C++ compiler supporting C++17 and a minimum CMake version of 3.14.
+Building (and running) is continuously tested under Linux, MacOS, and Windows using the [latest available system versions for GitHub Actions](https://github.com/actions/virtual-environments). However, the implementation should be compatible
+with any current C++ compiler supporting C++17 and a minimum CMake version of 3.14.
 
-`boost/program_options >= 1.50` is required for building the the commandline applications of the mapping tool.
-
-The SMT Solver [Z3 >= 4.8.3](https://github.com/Z3Prover/z3) has to be installed and the dynamic linker has to be able to find the library. This can be
-accomplished in a multitude of ways:
+The SMT Solver [Z3 >= 4.8.3](https://github.com/Z3Prover/z3) has to be installed and the dynamic linker has to be able to find the library. This can be accomplished in a multitude of ways:
 
 - Under Ubuntu 20.04 and newer: `sudo apt-get install libz3-dev`
 - Under macOS: `brew install z3`
@@ -21,37 +44,24 @@ accomplished in a multitude of ways:
 - Build Z3 from source and install it to the system
 
 
-## Configure, Build, and Install
+## Configuration and Build
 
 To start off, clone this repository using
 ```shell
-git clone --recurse-submodules -j8 https://github.com/lucasberent/qsatencoder
+git clone https://github.com/lucasberent/qsatencoder --recursive
 ```
-Note the `--recurse-submodules` flag. It is required to also clone all the required submodules, several modules from the
-QMAP toolkit https://github.com/iic-jku/qmap are needed.
+Note the `--recursive` flag. It is required to also clone all the required submodules.
 If you happen to forget passing the flag on your initial clone, you can initialize all the submodules by executing `git submodule update --init --recursive` in the main project directory.
 
-The Benchmarks are automated using the gtest framework. The project uses CMake as the main build configuration tool. Building a project using CMake is a two-stage process. First, CMake needs to be *configured* by calling
+The project uses CMake as the main build configuration tool. Building a project using CMake is a two-stage process. First, CMake needs to be *configured* by calling
 ```shell 
-cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=/path/to/g++ -DBUILD_QMAP_TESTS=ON -DBINDINGS=ON -DZ3_ROOT=/path/to/z3/
+cmake -S . -B build -DBUILD_QUSAT_TESTS=ON -DZ3_ROOT=/path/to/z3/
 ```
-This tells CMake to search the current directory `.` (passed via `-S`) for a *CMakeLists.txt* file and process it into a directory `build` (passed via `-B`).
-The flag `-DCMAKE_BUILD_TYPE=Debug` and `-DBUILD_QMAP_TESTS=ON` tell CMake to configure a *Debug* build which is needed for the test.
+This tells CMake to search the current directory `.` (passed via `-S`) for a *CMakeLists.txt* file and process it into a directory `build` (passed via `-B`). If your installation of Z3 is recent enough, the `Z3_ROOT` can typically be omitted.
 
-After configuring with CMake, the benchmarks can be built by calling
+After configuring with CMake, the library can be built by calling
 ```shell
-cmake --build build/ --target qsatencoder_satencoder_test
+cmake --build build
 ```
-This tries to build the benchmark project in the `build` directory (passed via `--build`).
+This tries to build the project in the `build` directory (passed via `--build`).
 Some operating systems and developer environments explicitly require a configuration to be set, which is why the `--config` flag is also passed to the build command. The flag `--parallel <NUMBER_OF_THREADS>` may be added to trigger a parallel build.
-
-## Usage
-After building the project, the benchmarks can be run by executing the corresponding test executable `qsatencoder_satencoder_test` in the build directory `build`.
-```
-./build/qsatencoder_satencoder_test --gtest_filter=SatEncoderBenchmarking.*:SatEncoderBenchmarking/*.*:SatEncoderBenchmarking.*/*:*/SatEncoderBenchmarking.*/*:*/SatEncoderBenchmarking/*.*
-```
-This will produce several .json files containing the experimental data. The python script `/test/results/visualizer.py` can be used
-to plot the respective data.
-
-Note that as we use a randomized procedure to generate input data the exact experimental data will slightly vary everytime the benchmarks are run.
-The experimental data used in the paper is available in the directory `/test/results`.
