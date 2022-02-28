@@ -126,7 +126,7 @@ BM_DEFINE_int32(v, 0);
 
 namespace internal {
 
-std::map<std::string, std::string>* global_context = nullptr;
+BENCHMARK_EXPORT std::map<std::string, std::string>* global_context = nullptr;
 
 // FIXME: wouldn't LTO mess this up?
 void UseCharPointer(char const volatile*) {}
@@ -388,9 +388,9 @@ std::unique_ptr<BenchmarkReporter> CreateReporter(
   if (name == "console") {
     return PtrType(new ConsoleReporter(output_opts));
   } else if (name == "json") {
-    return PtrType(new JSONReporter);
+    return PtrType(new JSONReporter());
   } else if (name == "csv") {
-    return PtrType(new CSVReporter);
+    return PtrType(new CSVReporter());
   } else {
     std::cerr << "Unexpected format: '" << name << "'\n";
     std::exit(1);
@@ -431,6 +431,14 @@ ConsoleReporter::OutputOptions GetOutputOptions(bool force_no_color) {
 
 }  // end namespace internal
 
+BenchmarkReporter* CreateDefaultDisplayReporter() {
+  static auto default_display_reporter =
+      internal::CreateReporter(FLAGS_benchmark_format,
+                               internal::GetOutputOptions())
+          .release();
+  return default_display_reporter;
+}
+
 size_t RunSpecifiedBenchmarks() {
   return RunSpecifiedBenchmarks(nullptr, nullptr, FLAGS_benchmark_filter);
 }
@@ -466,8 +474,7 @@ size_t RunSpecifiedBenchmarks(BenchmarkReporter* display_reporter,
   std::unique_ptr<BenchmarkReporter> default_display_reporter;
   std::unique_ptr<BenchmarkReporter> default_file_reporter;
   if (!display_reporter) {
-    default_display_reporter = internal::CreateReporter(
-        FLAGS_benchmark_format, internal::GetOutputOptions());
+    default_display_reporter.reset(CreateDefaultDisplayReporter());
     display_reporter = default_display_reporter.get();
   }
   auto& Out = display_reporter->GetOutputStream();
@@ -531,24 +538,29 @@ void AddCustomContext(const std::string& key, const std::string& value) {
 
 namespace internal {
 
+void (*HelperPrintf)();
+
 void PrintUsageAndExit() {
-  fprintf(stdout,
-          "benchmark"
-          " [--benchmark_list_tests={true|false}]\n"
-          "          [--benchmark_filter=<regex>]\n"
-          "          [--benchmark_min_time=<min_time>]\n"
-          "          [--benchmark_repetitions=<num_repetitions>]\n"
-          "          [--benchmark_enable_random_interleaving={true|false}]\n"
-          "          [--benchmark_report_aggregates_only={true|false}]\n"
-          "          [--benchmark_display_aggregates_only={true|false}]\n"
-          "          [--benchmark_format=<console|json|csv>]\n"
-          "          [--benchmark_out=<filename>]\n"
-          "          [--benchmark_out_format=<json|console|csv>]\n"
-          "          [--benchmark_color={auto|true|false}]\n"
-          "          [--benchmark_counters_tabular={true|false}]\n"
-          "          [--benchmark_perf_counters=<counter>,...]\n"
-          "          [--benchmark_context=<key>=<value>,...]\n"
-          "          [--v=<verbosity>]\n");
+  if (HelperPrintf) {
+    HelperPrintf();
+  } else {
+    fprintf(stdout,
+            "benchmark"
+            " [--benchmark_list_tests={true|false}]\n"
+            "          [--benchmark_filter=<regex>]\n"
+            "          [--benchmark_min_time=<min_time>]\n"
+            "          [--benchmark_repetitions=<num_repetitions>]\n"
+            "          [--benchmark_enable_random_interleaving={true|false}]\n"
+            "          [--benchmark_report_aggregates_only={true|false}]\n"
+            "          [--benchmark_display_aggregates_only={true|false}]\n"
+            "          [--benchmark_format=<console|json|csv>]\n"
+            "          [--benchmark_out=<filename>]\n"
+            "          [--benchmark_out_format=<json|console|csv>]\n"
+            "          [--benchmark_color={auto|true|false}]\n"
+            "          [--benchmark_counters_tabular={true|false}]\n"
+            "          [--benchmark_context=<key>=<value>,...]\n"
+            "          [--v=<verbosity>]\n");
+  }
   exit(0);
 }
 
@@ -611,9 +623,10 @@ int InitializeStreams() {
 
 }  // end namespace internal
 
-void Initialize(int* argc, char** argv) {
+void Initialize(int* argc, char** argv, void (*HelperPrintf)()) {
   internal::ParseCommandLineFlags(argc, argv);
   internal::LogLevel() = FLAGS_v;
+  internal::HelperPrintf = HelperPrintf;
 }
 
 void Shutdown() { delete internal::global_context; }
