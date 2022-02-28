@@ -1,28 +1,17 @@
 #include "CircuitOptimizer.hpp"
+#include "SatEncoder.hpp"
 #include "algorithms/RandomCliffordCircuit.hpp"
-#include "satencoder/SatEncoder.hpp"
 
-#include "gtest/gtest.h"
 #include <filesystem>
+#include <gtest/gtest.h>
 #include <locale>
 
-class SatEncoderPTest: public testing::TestWithParam<std::string> {
-protected:
-    std::string            test_example_dir = "../../examples/";
-    qc::QuantumComputation circuitOne{};
-    qc::QuantumComputation circuitTwo{};
-
-    void SetUp() override {
-        circuitOne.import(test_example_dir + GetParam() + ".qasm");
-        circuitTwo.import(test_example_dir + GetParam() + ".qasm");
-    }
-};
 class SatEncoderTest: public testing::TestWithParam<std::string> {
 protected:
-    std::string            test_example_dir = "../../examples/";
     qc::QuantumComputation circuitOne{};
     qc::QuantumComputation circuitTwo{};
 };
+
 TEST_F(SatEncoderTest, CheckEqualWhenEqualRandomCircuits) {
     std::random_device        rd;
     std::mt19937              gen(rd());
@@ -32,8 +21,7 @@ TEST_F(SatEncoderTest, CheckEqualWhenEqualRandomCircuits) {
 
     SatEncoder               sat_encoder;
     std::vector<std::string> inputs;
-    std::string              filename{};
-    bool                     result = sat_encoder.testEqual(circOne, circTwo, inputs, filename);
+    bool                     result = sat_encoder.testEqual(circOne, circTwo, inputs);
     EXPECT_EQ(result, true);
 }
 
@@ -48,8 +36,7 @@ TEST_F(SatEncoderTest, CheckEqualWhenNotEqualRandomCircuits) {
 
     SatEncoder               sat_encoder;
     std::vector<std::string> inputs;
-    std::string              filename{};
-    bool                     result = sat_encoder.testEqual(circOne, circTwo, inputs, filename);
+    bool                     result = sat_encoder.testEqual(circOne, circTwo, inputs);
     EXPECT_EQ(result, false);
 }
 
@@ -69,68 +56,8 @@ TEST_F(SatEncoderTest, CheckEqualWhenEqualRandomCircuitsWithInputs) {
     inputs.emplace_back("XZ");
     std::string filename{};
 
-    bool result = sat_encoder.testEqual(circOne, circTwo, inputs, filename);
+    bool result = sat_encoder.testEqual(circOne, circTwo, inputs);
     EXPECT_EQ(result, true);
-}
-
-INSTANTIATE_TEST_SUITE_P(SatEncoder, SatEncoderPTest,
-                         testing::Values(
-                                 "bell" //,
-                                 //"ghz",
-                                 //"simons"
-                                 ),
-                         [](const testing::TestParamInfo<SatEncoderTest::ParamType>& info) {
-                             std::string name = info.param;
-                             std::replace(name.begin(), name.end(), '-', '_');
-                             std::stringstream ss{};
-                             ss << name;
-                             return ss.str(); });
-TEST_P(SatEncoderPTest, CheckEqualWhenEqualNoInputs) {
-    SatEncoder               sat_encoder;
-    std::vector<std::string> inputs;
-    std::string              filename{};
-    bool                     result = sat_encoder.testEqual(circuitOne, circuitTwo, inputs, filename);
-    EXPECT_EQ(result, true);
-}
-TEST_P(SatEncoderPTest, CheckEqualWhenEqualTwoInputs) {
-    SatEncoder               sat_encoder;
-    std::vector<std::string> inputs;
-
-    inputs.emplace_back("ZX");
-    inputs.emplace_back("ZZ");
-    std::string filename{};
-    bool        result = sat_encoder.testEqual(circuitOne, circuitTwo, inputs, filename);
-    EXPECT_EQ(result, true);
-}
-
-TEST_P(SatEncoderPTest, CheckEqualWhenNotEqualTwoInputs) {
-    SatEncoder               sat_encoder;
-    std::vector<std::string> inputs;
-
-    inputs.emplace_back("ZX");
-    inputs.emplace_back("ZZ");
-    std::string filename{};
-    circuitTwo.erase(circuitTwo.begin());
-
-    bool result = sat_encoder.testEqual(circuitOne, circuitTwo, inputs, filename);
-    EXPECT_EQ(result, false);
-}
-
-TEST_P(SatEncoderPTest, SatWithoutInputs) {
-    SatEncoder               sat_encoder;
-    std::vector<std::string> inputs;
-    std::string              file;
-    sat_encoder.checkSatisfiability(circuitOne, inputs, file);
-}
-
-TEST_P(SatEncoderPTest, SatWithInputs) {
-    SatEncoder               sat_encoder;
-    std::vector<std::string> inputs;
-    inputs.emplace_back("XX");
-    inputs.emplace_back("Zz");
-    inputs.emplace_back("xZ");
-    std::string file;
-    sat_encoder.checkSatisfiability(circuitOne, inputs, file);
 }
 
 /* Benchmarking */
@@ -146,29 +73,32 @@ std::vector<std::string> getAllCompBasisStates(std::size_t nrQubits) {
     }
     return appended;
 }
+
 class SatEncoderBenchmarking: public testing::TestWithParam<std::string> {
 public:
-    const std::string benchmarkFilesPath = "";
+    const std::string benchmarkFilesPath;
 };
 TEST_F(SatEncoderBenchmarking, GrowingNrOfQubitsForFixedDepth) { // scaling wrt #qubits
     try {
-        std::vector<std::size_t> depths = {10, 50, 250, 1000};
-        for (size_t i = 0; i < depths.size(); i++) {
-            std::size_t        depth         = depths.at(i); // 10, 1: 50, 2:  1000, 3: 250
-            std::size_t        nrOfQubits    = 1;
-            const std::size_t  stepsize      = 1;
-            const std::size_t  maxNrOfQubits = 128;
+        // Paper Evaluation:
+        // std::vector<std::size_t> depths = {10, 50, 250, 1000};
+        std::vector<std::size_t> depths = {10, 50};
+        for (unsigned long depth: depths) {
+            // 10, 1: 50, 2:  1000, 3: 250
+            std::size_t       nrOfQubits = 1U;
+            const std::size_t stepsize   = 1U;
+            // Paper Evaluation:
+            // const std::size_t  maxNrOfQubits = 128;
+            const std::size_t  maxNrOfQubits = 16;
             std::random_device rd;
             std::ostringstream oss;
             auto               t  = std::time(nullptr);
             auto               tm = *std::localtime(&t);
             oss << std::put_time(&tm, "%d-%m-%Y");
             auto        filename = oss.str();
-            std::string filep    = benchmarkFilesPath + "QB-" + std::to_string(depth) + "-" + filename + ".json";
 
-            std::ofstream outfile(filep, std::fstream::app);
+            std::ofstream outfile(benchmarkFilesPath + "QB-" + std::to_string(depth) + "-" + filename + ".json");
             outfile << "{ \"benchmarks\" : [";
-            outfile.close();
 
             for (; nrOfQubits < maxNrOfQubits; nrOfQubits += stepsize) {
                 SatEncoder               sat_encoder;
@@ -176,13 +106,15 @@ TEST_F(SatEncoderBenchmarking, GrowingNrOfQubitsForFixedDepth) { // scaling wrt 
                 for (size_t j = 0; j < 10; j++) { // 10 runs with same params for representative sample
                     qc::RandomCliffordCircuit circOne(nrOfQubits, depth, rd());
                     qc::CircuitOptimizer::flattenOperations(circOne);
-                    sat_encoder.checkSatisfiability(circOne, inputs, filep);
+                    if (nrOfQubits != 1U || j != 0U) {
+                        outfile << ", ";
+                    }
+                    sat_encoder.checkSatisfiability(circOne, inputs);
+                    outfile << sat_encoder.to_json().dump(2U);
                 }
             }
-
-            std::ofstream outfile2(filep, std::fstream::app);
-            outfile2 << "]}";
-            outfile2.close();
+            outfile << "]}";
+            outfile.close();
         }
     } catch (std::exception& e) {
         std::cerr << "EXCEPTION THROWN" << std::endl;
@@ -192,36 +124,39 @@ TEST_F(SatEncoderBenchmarking, GrowingNrOfQubitsForFixedDepth) { // scaling wrt 
 
 TEST_F(SatEncoderBenchmarking, GrowingCircuitSizeForFixedQubits) { // scaling wrt to circuit size
     try {
-        std::vector<std::size_t> qubits = {5, 20, 65, 127};
-        for (size_t i = 0; i < qubits.size(); i++) {
-            std::size_t        depth      = 1;
-            std::size_t        maxDepth   = 500;
-            std::size_t        nrOfQubits = qubits.at(i);
-            const std::size_t  stepsize   = 5;
+        // Paper Evaluation:
+        // std::vector<std::size_t> qubits = {5, 20, 65, 127};
+        std::vector<std::size_t> qubits = {5, 20};
+        for (unsigned long nrOfQubits: qubits) {
+            std::size_t        depth    = 1U;
+            // Paper Evaluation:
+            // std::size_t        maxDepth = 500;
+            std::size_t        maxDepth = 50U;
+            const std::size_t  stepsize = 5U;
             std::random_device rd;
             std::ostringstream oss;
             auto               t  = std::time(nullptr);
             auto               tm = *std::localtime(&t);
             oss << std::put_time(&tm, "%d-%m-%Y");
             auto        filename = oss.str();
-            std::string filep    = benchmarkFilesPath+"CS-" + std::to_string(nrOfQubits) + "-" + filename + ".json"; // adapt name accordingly
 
-            std::ofstream outfile(filep, std::fstream::app);
+            std::ofstream outfile(benchmarkFilesPath + "CS-" + std::to_string(nrOfQubits) + "-" + filename + ".json");
             outfile << "{ \"benchmarks\" : [";
-            outfile.close();
             std::vector<std::string> inputs;
             for (; depth <= maxDepth; depth += stepsize) {
                 SatEncoder sat_encoder;
                 for (size_t j = 0; j < 10; j++) { // 10 runs with same params for representative sample
                     qc::RandomCliffordCircuit circOne(nrOfQubits, depth, rd());
                     qc::CircuitOptimizer::flattenOperations(circOne);
-                    sat_encoder.checkSatisfiability(circOne, inputs, filep);
+                    if (depth != 1U || j != 0U) {
+                        outfile << ", ";
+                    }
+                    sat_encoder.checkSatisfiability(circOne, inputs);
+                    outfile << sat_encoder.to_json().dump(2U);
                 }
             }
-
-            std::ofstream outfile2(filep, std::fstream::app);
-            outfile2 << "]}";
-            outfile2.close();
+            outfile << "]}";
+            outfile.close();
         }
     } catch (std::exception& e) {
         std::cerr << "EXCEPTION THROWN" << std::endl;
@@ -231,36 +166,37 @@ TEST_F(SatEncoderBenchmarking, GrowingCircuitSizeForFixedQubits) { // scaling wr
 
 TEST_F(SatEncoderBenchmarking, GrowingCircuitSizeForFixedQubitsGenerators) { // generators wrt circsize
     try {
-        std::vector<std::size_t> qubits = {2};
-        for (size_t i = 0; i < qubits.size(); i++) {
-            std::size_t        depth      = 1;
-            std::size_t        maxDepth   = 100;
-            std::size_t        nrOfQubits = qubits.at(i);
-            const std::size_t  stepsize   = 1;
+        std::vector<std::size_t> qubits = {1, 2, 3};
+        for (unsigned long nrOfQubits: qubits) {
+            std::size_t        depth    = 1U;
+            // Paper Evaluation:
+            // std::size_t        maxDepth = 100;
+            std::size_t        maxDepth = 10U;
+            const std::size_t  stepsize = 1U;
             std::random_device rd;
             std::ostringstream oss;
             auto               t  = std::time(nullptr);
             auto               tm = *std::localtime(&t);
             oss << std::put_time(&tm, "%d-%m-%Y");
             auto        filename = oss.str();
-            std::string filep    = benchmarkFilesPath+"G-" + std::to_string(nrOfQubits) + "-" + filename + ".json"; // adapt name accordingly
 
-            std::ofstream outfile(filep, std::fstream::app);
+            std::ofstream outfile(benchmarkFilesPath + "G-" + std::to_string(nrOfQubits) + "-" + filename + ".json");
             outfile << "{ \"benchmarks\" : [";
-            outfile.close();
             std::vector<std::string> inputs;
             for (; depth <= maxDepth; depth += stepsize) {
                 SatEncoder sat_encoder;
-                for (size_t j = 0; j < 20; j++) { // 10 runs with same params for representative sample
+                for (size_t j = 0; j < 10; j++) { // 10 runs with same params for representative sample
                     qc::RandomCliffordCircuit circOne(nrOfQubits, depth, rd());
                     qc::CircuitOptimizer::flattenOperations(circOne);
-                    sat_encoder.checkSatisfiability(circOne, inputs, filep);
+                    if (depth != 1U || j != 0U) {
+                        outfile << ", ";
+                    }
+                    sat_encoder.checkSatisfiability(circOne, inputs);
+                    outfile << sat_encoder.to_json().dump(2U);
                 }
             }
-
-            std::ofstream outfile2(filep, std::fstream::app);
-            outfile2 << "]}";
-            outfile2.close();
+            outfile << "]}";
+            outfile.close();
         }
     } catch (std::exception& e) {
         std::cerr << "EXCEPTION THROWN" << std::endl;
@@ -270,10 +206,14 @@ TEST_F(SatEncoderBenchmarking, GrowingCircuitSizeForFixedQubitsGenerators) { // 
 
 TEST_F(SatEncoderBenchmarking, EquivalenceCheckingGrowingNrOfQubits) { // Equivalence Checking
     try {
-        const std::size_t  depth         = 1000;
+        // Paper Evaluation:
+        // const std::size_t  depth         = 1000;
+        const std::size_t  depth         = 100;
         std::size_t        qubitCnt      = 4;
         const std::size_t  stepsize      = 4;
-        const std::size_t  maxNrOfQubits = 128;
+        // Paper Evaluation:
+        // const std::size_t  maxNrOfQubits = 128;
+        const std::size_t  maxNrOfQubits = 16;
         std::random_device rd;
         std::random_device rd2;
         std::random_device rd3;
@@ -285,11 +225,9 @@ TEST_F(SatEncoderBenchmarking, EquivalenceCheckingGrowingNrOfQubits) { // Equiva
         auto               tm = *std::localtime(&t);
         oss << std::put_time(&tm, "%d-%m-%Y");
         auto        timestamp = oss.str();
-        std::string filename  = benchmarkFilesPath+"EC-" + timestamp + ".json";
 
-        std::ofstream outfile(filename, std::fstream::app);
+        std::ofstream outfile(benchmarkFilesPath + "EC-" + timestamp + ".json");
         outfile << "{ \"benchmarks\" : [";
-        outfile.close();
 
         auto                            ipts = getAllCompBasisStates(5);
         std::uniform_int_distribution<> distr(0, 31);
@@ -305,7 +243,11 @@ TEST_F(SatEncoderBenchmarking, EquivalenceCheckingGrowingNrOfQubits) { // Equiva
             qc::RandomCliffordCircuit circOne(qubitCnt, depth, gen());
             qc::CircuitOptimizer::flattenOperations(circOne);
             auto circTwo = circOne.clone();
-            sat_encoder.testEqual(circOne, circTwo, inputs, filename); // equivalent case
+            if (qubitCnt != 4) {
+                outfile << ", ";
+            }
+            sat_encoder.testEqual(circOne, circTwo, inputs); // equivalent case
+            outfile << sat_encoder.to_json().dump(2U);
         }
 
         qubitCnt = 4;
@@ -324,13 +266,13 @@ TEST_F(SatEncoderBenchmarking, EquivalenceCheckingGrowingNrOfQubits) { // Equiva
                 auto                            circFour = circThree.clone();
                 std::uniform_int_distribution<> distr2(0, circFour.size()); // random error location in circuit
                 circFour.erase(circFour.begin() + distr2(gen));
-                result = sat_encoder.testEqual(circThree, circFour, inputs, filename);
-            } while (result == true);
+                outfile << ", ";
+                sat_encoder.testEqual(circThree, circFour, inputs); // equivalent case
+                outfile << sat_encoder.to_json().dump(2U);
+            } while (result);
         }
-
-        std::ofstream outfile2(filename, std::fstream::app);
-        outfile2 << "]}";
-        outfile2.close();
+        outfile << "]}";
+        outfile.close();
     } catch (std::exception& e) {
         std::cerr << "EXCEPTION THROWN" << std::endl;
         std::cout << e.what() << std::endl;

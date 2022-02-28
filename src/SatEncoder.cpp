@@ -1,6 +1,6 @@
-#include "satencoder/SatEncoder.hpp"
+#include "SatEncoder.hpp"
 
-bool SatEncoder::testEqual(qc::QuantumComputation& circuitOne, qc::QuantumComputation& circuitTwo, std::vector<std::string>& inputs, std::string& filename) {
+bool SatEncoder::testEqual(qc::QuantumComputation& circuitOne, qc::QuantumComputation& circuitTwo, std::vector<std::string>& inputs) {
     //std::cout << circuitOne << std::endl;
     //std::cout << circuitTwo << std::endl;
 
@@ -28,14 +28,9 @@ bool SatEncoder::testEqual(qc::QuantumComputation& circuitOne, qc::QuantumComput
     bool equal  = !isSatisfiable(solver);
     stats.equal = equal;
 
-    // for benchmarking
-    if (!filename.empty()) {
-        std::ofstream outfile(filename, std::fstream::app);
-        outfile << "," << stats.to_json();
-    }
     return equal;
 }
-void SatEncoder::checkSatisfiability(qc::QuantumComputation& circuitOne, std::vector<std::string>& inputs, std::string& filename) {
+void SatEncoder::checkSatisfiability(qc::QuantumComputation& circuitOne, std::vector<std::string>& inputs) {
     if (!isClifford(circuitOne)) {
         std::cerr << "Circuit is not Clifford Circuit." << std::endl;
         return;
@@ -54,15 +49,10 @@ void SatEncoder::checkSatisfiability(qc::QuantumComputation& circuitOne, std::ve
 
     bool sat          = this->isSatisfiable(solver);
     stats.satisfiable = sat;
-    // print to benchmark file
-    if (!filename.empty()) {
-        std::ofstream outfile(filename, std::fstream::app);
-        outfile << "," << stats.to_json();
-    }
 }
 
 bool SatEncoder::isSatisfiable(z3::solver& solver) {
-    bool result            = false;
+    bool result = false;
     std::cout << "Starting SAT solving" << std::endl;
     auto before            = std::chrono::high_resolution_clock::now();
     auto sat               = solver.check();
@@ -228,7 +218,7 @@ void SatEncoder::constructSatInstance(SatEncoder::CircuitRepresentation& circuit
     // z3 context used throughout this function
     auto& ctx = solver.ctx();
 
-    const auto        depth = circuitRepresentation.generatorMappings.size();
+    const auto            depth = circuitRepresentation.generatorMappings.size();
     std::vector<z3::expr> vars{};
     vars.reserve(depth + 1U);
     std::string bvName = "x^";
@@ -280,7 +270,7 @@ void SatEncoder::constructMiterInstance(SatEncoder::CircuitRepresentation& circO
     auto& ctx = solver.ctx();
 
     /// encode first circuit
-    const auto        depthOne = circOneRep.generatorMappings.size();
+    const auto            depthOne = circOneRep.generatorMappings.size();
     std::vector<z3::expr> varsOne{};
     varsOne.reserve(depthOne + 1U);
     std::string bvName = "x^";
@@ -323,7 +313,7 @@ void SatEncoder::constructMiterInstance(SatEncoder::CircuitRepresentation& circO
         }
     }
     /// encode second circuit
-    auto              depthTwo = circTwoRep.generatorMappings.size();
+    auto                  depthTwo = circTwoRep.generatorMappings.size();
     std::vector<z3::expr> varsTwo{};
     varsOne.reserve(depthTwo + 1U);
     bvName = "x'^";
@@ -544,7 +534,7 @@ void SatEncoder::QState::printStateTableau() {
     }
     std::cout << std::endl;
 }
-json SatEncoder::Statistics::to_json() {
+json SatEncoder::Statistics::to_json() const {
     return json{
             {"numGates", nrOfGates},
             {"nrOfQubits", nrOfQubits},

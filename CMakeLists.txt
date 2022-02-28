@@ -1,31 +1,18 @@
 cmake_minimum_required(VERSION 3.14...3.22)
 
-project(qsatencoder
+project(qusat
         LANGUAGES CXX
-        VERSION 1.5.1
-        DESCRIPTION "A SAT formulation construction algorithm for Clifford quantum circuits"
+        VERSION 0.1.0
+        DESCRIPTION "A tool for utilizing SAT in quantum computing"
         )
 
 # enable organization of targets into folders
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 # configuration options
-option(DEPLOY "Configure for deployment")
-option(BINDINGS "Configure for building Python bindings")
 option(COVERAGE "Configure for coverage report generation")
 option(GENERATE_POSITION_INDEPENDENT_CODE "Generate position independent code")
-option(BUILD_QMAP_TESTS "Also build tests for QMAP project")
-
-if (DEFINED ENV{DEPLOY})
-	set(DEPLOY $ENV{DEPLOY} CACHE BOOL "Use deployment configuration from environment" FORCE)
-	message(STATUS "Setting deployment configuration to '${DEPLOY}' from environment")
-endif ()
-
-# set deployment specific options
-if (DEPLOY)
-	# set the macOS deployment target appropriately
-	set(CMAKE_OSX_DEPLOYMENT_TARGET "10.15" CACHE STRING "" FORCE)
-endif ()
+option(BUILD_QUSAT_TESTS "Also build tests for project")
 
 # build type settings
 set(default_build_type "Release")
@@ -47,23 +34,19 @@ check_submodule_present(qfr)
 list (APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 # search for Z3
-find_package(Z3)
+find_package(Z3 REQUIRED)
 if(Z3_FOUND AND NOT TARGET z3::z3lib)
-	message(STATUS "Found Z3 with version ${Z3_VERSION_STRING}")
 	add_library(z3::z3lib IMPORTED INTERFACE)
 	set_property(TARGET z3::z3lib PROPERTY INTERFACE_INCLUDE_DIRECTORIES ${Z3_CXX_INCLUDE_DIRS})
 	set_property(TARGET z3::z3lib PROPERTY INTERFACE_LINK_LIBRARIES ${Z3_LIBRARIES})
-else()
-	message(WARNING "Did not find Z3. Exact library and other depending target will not be available")
 endif()
 
 # add main library code
 add_subdirectory(src)
 
 # add test code
-if (BUILD_QMAP_TESTS)
+if (BUILD_QUSAT_TESTS)
 	enable_testing()
 	include(GoogleTest)
 	add_subdirectory(test)
 endif ()
-

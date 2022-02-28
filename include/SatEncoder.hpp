@@ -1,5 +1,4 @@
-#ifndef SATENCODER_HPP
-#define SATENCODER_HPP
+#pragma once
 
 #include "CircuitOptimizer.hpp"
 #include "QuantumComputation.hpp"
@@ -9,9 +8,9 @@
 #include <boost/uuid/uuid_generators.hpp> // generators
 #include <boost/uuid/uuid_io.hpp>         // streaming operators etc.
 #include <chrono>
+#include <iostream>
 #include <locale>
 #include <nlohmann/json.hpp>
-#include <ostream>
 #include <z3++.h>
 
 using json = nlohmann::json;
@@ -25,13 +24,15 @@ public:
      * @param circuitTwo second circuit
      * @param inputs input states to consider. In stabilizer representation, e.g. ZZ == |00>
      */
-    bool testEqual(qc::QuantumComputation& circuit, qc::QuantumComputation& circuitTwo, std::vector<std::string>& inputs, std::string& filename);
+    bool testEqual(qc::QuantumComputation& circuit, qc::QuantumComputation& circuitTwo, std::vector<std::string>& inputs);
     /**
      * Constructs SAT instance for input circuit and checks satisfiability for given inputs
      * @param circuitOne circuit to construct SAT instance for
      * @param inputs input states to consider. In stabilizer representation, e.g., ZZ == |00>
      */
-    void checkSatisfiability(qc::QuantumComputation& circuitOne, std::vector<std::string>& inputs, std::string& filename);
+    void checkSatisfiability(qc::QuantumComputation& circuitOne, std::vector<std::string>& inputs);
+
+    [[nodiscard]] json to_json() const { return stats.to_json(); }
 
 private:
     struct Statistics {
@@ -48,7 +49,7 @@ private:
         std::size_t                   preprocTime         = 0U;
         std::size_t                   solvingTime         = 0U;
         std::size_t                   satConstructionTime = 0U;
-        json                          to_json();
+        [[nodiscard]] json            to_json() const;
         void                          from_json(const json& j);
     };
 
@@ -90,5 +91,3 @@ private:
     std::size_t                                                        nrOfInputGenerators = 0U;
     std::size_t                                                        uniqueGenCnt        = 0U;
 };
-
-#endif //QMAP_SATENCODER_HPP

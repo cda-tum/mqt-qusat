@@ -15,11 +15,11 @@ if (NOT TARGET gtest OR NOT TARGET gmock)
 	endif()
 endif()
 
-macro(package_add_test TESTNAME LIBRARY)
+macro(package_add_test TESTNAME)
 	# create an exectuable in which the tests will be stored
 	add_executable(${TESTNAME} ${ARGN})
 	# link the Google test infrastructure and a default main fuction to the test executable.
-	target_link_libraries(${TESTNAME} PRIVATE JKQ::${PROJECT_NAME}_${LIBRARY}_lib gmock gtest_main)
+	target_link_libraries(${TESTNAME} PRIVATE MQT::${PROJECT_NAME} gmock gtest_main)
 	# discover tests
 	gtest_discover_tests(${TESTNAME} WORKING_DIRECTORY ${PROJECT_DIR} PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY "${PROJECT_DIR}")
 	set_target_properties(${TESTNAME} PROPERTIES FOLDER tests)
@@ -27,14 +27,8 @@ macro(package_add_test TESTNAME LIBRARY)
 	add_custom_command(TARGET ${TESTNAME}
 	                   POST_BUILD
 	                   COMMAND ${CMAKE_COMMAND} -E create_symlink $<TARGET_FILE_DIR:${TESTNAME}>/${TESTNAME} ${CMAKE_BINARY_DIR}/${TESTNAME}
-	                   COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/../examples $<TARGET_FILE_DIR:${TESTNAME}>/examples
-	                   COMMAND ${CMAKE_COMMAND} -E create_symlink $<TARGET_FILE_DIR:${TESTNAME}>/examples ${CMAKE_BINARY_DIR}/examples
-	                   COMMAND ${CMAKE_COMMAND} -E create_symlink $<TARGET_FILE_DIR:${TESTNAME}>/calibration ${CMAKE_BINARY_DIR}/calibration
-	                   COMMENT "Copying files and creating symlinks for ${TESTNAME}"
+	                   COMMENT "Creating symlinks for ${TESTNAME}"
 	                   VERBATIM)
 endmacro()
 
-if (TARGET ${PROJECT_NAME}_satencoder_lib)
-	package_add_test(${PROJECT_NAME}_satencoder_test satencoder
-			${CMAKE_CURRENT_SOURCE_DIR}/test_satencoder.cpp)
-endif ()
+package_add_test(${PROJECT_NAME}_test ${CMAKE_CURRENT_SOURCE_DIR}/test_satencoder.cpp)
