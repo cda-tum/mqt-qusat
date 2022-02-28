@@ -417,13 +417,11 @@ std::vector<boost::dynamic_bitset<>> SatEncoder::QState::getLevelGenerator() con
 SatEncoder::QState SatEncoder::initializeState(unsigned long nrOfQubits, std::string input) {
     SatEncoder::QState result;
     result.SetN(nrOfQubits);
-    std::vector<boost::dynamic_bitset<>> tx(nrOfQubits);
-    std::vector<boost::dynamic_bitset<>> tz(nrOfQubits);
+    std::vector<boost::dynamic_bitset<>> tx(nrOfQubits, boost::dynamic_bitset<>(nrOfQubits));
+    std::vector<boost::dynamic_bitset<>> tz(nrOfQubits, boost::dynamic_bitset<>(nrOfQubits));
     std::vector<int>                     tr(nrOfQubits, 0);
 
     for (std::size_t i = 0U; i < nrOfQubits; i++) {
-        tx[i] = boost::dynamic_bitset(nrOfQubits);
-        tz[i] = boost::dynamic_bitset(nrOfQubits);
         for (std::size_t j = 0U; j < nrOfQubits; j++) {
             if (i == j) {
                 tz[i][j] = true; // initial 0..0 state corresponds to x matrix all zero and z matrix = Id_n
