@@ -49,7 +49,7 @@ endif()
 # add coverage compiler and linker flag to the library and all targets that link against it, if COVERAGE is set
 if (COVERAGE)
 	target_compile_options(${PROJECT_NAME} PUBLIC --coverage)
-	target_linkraries(${PROJECT_NAME} PUBLIC --coverage)
+	target_link_libraries(${PROJECT_NAME} PUBLIC --coverage)
 endif()
 
 # add MQT alias
