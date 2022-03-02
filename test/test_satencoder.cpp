@@ -8,8 +8,6 @@
 
 class SatEncoderTest: public testing::TestWithParam<std::string> {
 protected:
-    qc::QuantumComputation circuitOne{};
-    qc::QuantumComputation circuitTwo{};
 };
 
 TEST_F(SatEncoderTest, CheckEqualWhenEqualRandomCircuits) {
