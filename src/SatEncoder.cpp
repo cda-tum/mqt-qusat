@@ -102,8 +102,7 @@ SatEncoder::CircuitRepresentation SatEncoder::preprocessCircuit(qc::DAG& dag, st
     // store generators of input state
     for (auto& state: states) {
         auto        initLevelGenerator = state.getLevelGenerator();
-        auto        inspair            = generators.emplace(initLevelGenerator,
-                                                            uniqueGenCnt);
+        auto        inspair            = generators.emplace(initLevelGenerator, uniqueGenCnt);
         std::size_t id;
         if (inspair.second) {
             id = uniqueGenCnt++;
