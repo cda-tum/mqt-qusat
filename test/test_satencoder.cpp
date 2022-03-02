@@ -27,6 +27,11 @@ TEST_F(SatEncoderTest, CheckEqualWhenNotEqualRandomCircuits) {
     std::random_device        rd;
     std::mt19937              gen(rd());
     qc::RandomCliffordCircuit circOne(2, 1, gen());
+
+    while (circOne.empty()) {
+        circOne = qc::RandomCliffordCircuit(2, 1, gen());
+    }
+
     qc::CircuitOptimizer::flattenOperations(circOne);
     auto circTwo = circOne.clone();
 
