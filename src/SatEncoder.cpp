@@ -1,7 +1,6 @@
 #include "SatEncoder.hpp"
 
-bool SatEncoder::testEqual(qc::QuantumComputation& circuitOne, qc::QuantumComputation& circuitTwo,
-                           std::vector<std::string>& inputs) {
+bool SatEncoder::testEqual(qc::QuantumComputation& circuitOne, qc::QuantumComputation& circuitTwo, const std::vector<std::string>& inputs) {
     if (!isClifford(circuitOne) || !isClifford(circuitTwo)) {
         std::cerr << "Circuits are not Clifford circuits" << std::endl;
         return false;
@@ -26,7 +25,17 @@ bool SatEncoder::testEqual(qc::QuantumComputation& circuitOne, qc::QuantumComput
     return equal;
 }
 
-void SatEncoder::checkSatisfiability(qc::QuantumComputation& circuitOne, std::vector<std::string>& inputs) {
+bool SatEncoder::testEqual(qc::QuantumComputation& circuitOne, qc::QuantumComputation& circuitTwo) {
+    std::vector<std::string> inputs;
+    return testEqual(circuitOne, circuitTwo, inputs);
+}
+
+void SatEncoder::checkSatisfiability(qc::QuantumComputation& circuitOne) {
+    std::vector<std::string> inputs;
+    return checkSatisfiability(circuitOne, inputs);
+}
+
+void SatEncoder::checkSatisfiability(qc::QuantumComputation& circuitOne, const std::vector<std::string>& inputs) {
     if (!isClifford(circuitOne)) {
         std::cerr << "Circuit is not Clifford Circuit." << std::endl;
         return;
@@ -45,6 +54,7 @@ void SatEncoder::checkSatisfiability(qc::QuantumComputation& circuitOne, std::ve
 
 bool SatEncoder::isSatisfiable(z3::solver& solver) {
     bool result            = false;
+    stats.satisfiable      = false;
     auto before            = std::chrono::high_resolution_clock::now();
     auto sat               = solver.check();
     auto after             = std::chrono::high_resolution_clock::now();
@@ -54,7 +64,6 @@ bool SatEncoder::isSatisfiable(z3::solver& solver) {
     if (sat == z3::check_result::sat) {
         stats.satisfiable = true;
         result            = true;
-    } else if (sat == z3::check_result::unsat) {
     }
 
     for (size_t i = 0; i < solver.statistics().size(); i++) {
@@ -70,7 +79,7 @@ bool SatEncoder::isSatisfiable(z3::solver& solver) {
     return result;
 }
 
-SatEncoder::CircuitRepresentation SatEncoder::preprocessCircuit(qc::DAG& dag, std::vector<std::string>& inputs) {
+SatEncoder::CircuitRepresentation SatEncoder::preprocessCircuit(const qc::DAG& dag, const std::vector<std::string>& inputs) {
     auto                              before         = std::chrono::high_resolution_clock::now();
     std::size_t                       inputSize      = dag.size();
     std::size_t                       nrOfLevels     = 0;
@@ -91,7 +100,7 @@ SatEncoder::CircuitRepresentation SatEncoder::preprocessCircuit(qc::DAG& dag, st
     stats.circuitDepth               = nrOfLevels > stats.circuitDepth ? nrOfLevels : stats.circuitDepth;
     representation.generatorMappings = std::vector<std::map<std::size_t, std::size_t>>(nrOfLevels);
 
-    if (inputs.size() > 1) {
+    if (!inputs.empty()) {
         for (auto& input: inputs) {
             states.push_back(initializeState(nrOfQubits, input));
         }
@@ -110,7 +119,7 @@ SatEncoder::CircuitRepresentation SatEncoder::preprocessCircuit(qc::DAG& dag, st
             id = generators.at(initLevelGenerator);
         }
         representation.idGeneratorMap.emplace(id, initLevelGenerator);
-        state.SetPrevGenId(id);
+        state.prevGenId = id;
     }
 
     if (nrOfInputGenerators == 0) { // only in first pass
@@ -172,8 +181,8 @@ SatEncoder::CircuitRepresentation SatEncoder::preprocessCircuit(qc::DAG& dag, st
                 id = generators.at(currLevelGen);
             }
             representation.idGeneratorMap.emplace(id, currLevelGen);
-            representation.generatorMappings.at(levelCnt).insert(std::make_pair(state.GetPrevGenId(), id));
-            state.SetPrevGenId(id);
+            representation.generatorMappings.at(levelCnt).insert(std::make_pair(state.prevGenId, id));
+            state.prevGenId = id;
         }
     }
     auto after = std::chrono::high_resolution_clock::now();
@@ -182,7 +191,7 @@ SatEncoder::CircuitRepresentation SatEncoder::preprocessCircuit(qc::DAG& dag, st
 }
 
 //construct z3 instance from preprocessing information
-void SatEncoder::constructSatInstance(SatEncoder::CircuitRepresentation& circuitRepresentation, z3::solver& solver) {
+void SatEncoder::constructSatInstance(const SatEncoder::CircuitRepresentation& circuitRepresentation, z3::solver& solver) {
     auto before = std::chrono::high_resolution_clock::now();
     // number of unique generators that need to be encoded
     const auto generatorCnt = generators.size();
@@ -235,8 +244,8 @@ void SatEncoder::constructSatInstance(SatEncoder::CircuitRepresentation& circuit
     stats.satConstructionTime = std::chrono::duration_cast<std::chrono::milliseconds>(after - before).count();
 }
 
-void SatEncoder::constructMiterInstance(SatEncoder::CircuitRepresentation& circOneRep,
-                                        SatEncoder::CircuitRepresentation& circTwoRep, z3::solver& solver) {
+void SatEncoder::constructMiterInstance(const SatEncoder::CircuitRepresentation& circOneRep,
+                                        const SatEncoder::CircuitRepresentation& circTwoRep, z3::solver& solver) {
     auto before = std::chrono::high_resolution_clock::now();
     // number of unique generators that need to be encoded
     const auto generatorCnt = generators.size();
@@ -337,7 +346,7 @@ void SatEncoder::constructMiterInstance(SatEncoder::CircuitRepresentation& circO
     stats.satConstructionTime = std::chrono::duration_cast<std::chrono::milliseconds>(after - before).count();
 }
 
-bool SatEncoder::isClifford(qc::QuantumComputation& qc) {
+bool SatEncoder::isClifford(const qc::QuantumComputation& qc) {
     qc::OpType opType;
     for (const auto& op: qc) {
         opType = op->getType();
@@ -377,9 +386,9 @@ std::vector<std::vector<bool>> SatEncoder::QState::getLevelGenerator() const {
     return result;
 }
 
-SatEncoder::QState SatEncoder::initializeState(unsigned long nrOfQubits, std::string input) {
+SatEncoder::QState SatEncoder::initializeState(unsigned long nrOfQubits, const std::string& input) {
     SatEncoder::QState result;
-    result.SetN(nrOfQubits);
+    result.n = nrOfQubits;
     std::vector<std::vector<bool>> tx(nrOfQubits, std::vector<bool>(nrOfQubits));
     std::vector<std::vector<bool>> tz(nrOfQubits, std::vector<bool>(nrOfQubits));
     std::vector<int>               tr(nrOfQubits, 0);
@@ -392,9 +401,9 @@ SatEncoder::QState SatEncoder::initializeState(unsigned long nrOfQubits, std::st
         }
     }
 
-    result.SetX(tx);
-    result.SetZ(tz);
-    result.SetR(tr);
+    result.x = tx;
+    result.z = tz;
+    result.r = tr;
     if (!input.empty()) { //
         for (std::size_t i = 0U; i < input.length(); i++) {
             switch (input[i]) {
@@ -459,34 +468,6 @@ void SatEncoder::QState::applyS(unsigned long target) {
         r[i] ^= x[i][target] * z[i][target];
         z[i][target] = z[i][target] ^ x[i][target];
     }
-}
-
-void SatEncoder::QState::SetN(unsigned long N) {
-    QState::n = N;
-}
-
-const std::vector<std::vector<bool>>& SatEncoder::QState::GetX() const {
-    return x;
-}
-
-void SatEncoder::QState::SetX(const std::vector<std::vector<bool>>& X) {
-    QState::x = X;
-}
-
-void SatEncoder::QState::SetZ(const std::vector<std::vector<bool>>& Z) {
-    QState::z = Z;
-}
-
-void SatEncoder::QState::SetR(const std::vector<int>& R) {
-    QState::r = R;
-}
-
-const std::size_t& SatEncoder::QState::GetPrevGenId() const {
-    return prevGenId;
-}
-
-void SatEncoder::QState::SetPrevGenId(const std::size_t& prev_gen_id) {
-    prevGenId = prev_gen_id;
 }
 
 void SatEncoder::QState::printStateTableau() {

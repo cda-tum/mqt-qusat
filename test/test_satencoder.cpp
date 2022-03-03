@@ -17,9 +17,8 @@ TEST_F(SatEncoderTest, CheckEqualWhenEqualRandomCircuits) {
     qc::CircuitOptimizer::flattenOperations(circOne);
     auto circTwo = circOne.clone();
 
-    SatEncoder               sat_encoder;
-    std::vector<std::string> inputs;
-    bool                     result = sat_encoder.testEqual(circOne, circTwo, inputs);
+    SatEncoder sat_encoder;
+    bool       result = sat_encoder.testEqual(circOne, circTwo);
     EXPECT_EQ(result, true);
 }
 
@@ -32,9 +31,8 @@ TEST_F(SatEncoderTest, CheckEqualWhenNotEqualRandomCircuits) {
 
     circTwo.erase(circTwo.begin());
 
-    SatEncoder               sat_encoder;
-    std::vector<std::string> inputs;
-    bool                     result = sat_encoder.testEqual(circOne, circTwo, inputs);
+    SatEncoder sat_encoder;
+    bool       result = sat_encoder.testEqual(circOne, circTwo);
     EXPECT_EQ(result, false);
 }
 
@@ -103,14 +101,13 @@ TEST_F(SatEncoderBenchmarking, GrowingNrOfQubitsForFixedDepth) { // scaling wrt 
 
             for (; nrOfQubits < maxNrOfQubits; nrOfQubits += stepsize) {
                 SatEncoder               sat_encoder;
-                std::vector<std::string> inputs;
                 for (size_t j = 0; j < 10; j++) { // 10 runs with same params for representative sample
                     qc::RandomCliffordCircuit circOne(nrOfQubits, depth, rd());
                     qc::CircuitOptimizer::flattenOperations(circOne);
                     if (nrOfQubits != 1U || j != 0U) {
                         outfile << ", ";
                     }
-                    sat_encoder.checkSatisfiability(circOne, inputs);
+                    sat_encoder.checkSatisfiability(circOne);
                     outfile << sat_encoder.to_json().dump(2U);
                 }
             }
@@ -143,7 +140,6 @@ TEST_F(SatEncoderBenchmarking, GrowingCircuitSizeForFixedQubits) { // scaling wr
 
             std::ofstream outfile(benchmarkFilesPath + "CS-" + std::to_string(nrOfQubits) + "-" + filename + ".json");
             outfile << "{ \"benchmarks\" : [";
-            std::vector<std::string> inputs;
             for (; depth <= maxDepth; depth += stepsize) {
                 SatEncoder sat_encoder;
                 for (size_t j = 0; j < 10; j++) { // 10 runs with same params for representative sample
@@ -152,7 +148,7 @@ TEST_F(SatEncoderBenchmarking, GrowingCircuitSizeForFixedQubits) { // scaling wr
                     if (depth != 1U || j != 0U) {
                         outfile << ", ";
                     }
-                    sat_encoder.checkSatisfiability(circOne, inputs);
+                    sat_encoder.checkSatisfiability(circOne);
                     outfile << sat_encoder.to_json().dump(2U);
                 }
             }
@@ -183,7 +179,6 @@ TEST_F(SatEncoderBenchmarking, GrowingCircuitSizeForFixedQubitsGenerators) { // 
 
             std::ofstream outfile(benchmarkFilesPath + "G-" + std::to_string(nrOfQubits) + "-" + filename + ".json");
             outfile << "{ \"benchmarks\" : [";
-            std::vector<std::string> inputs;
             for (; depth <= maxDepth; depth += stepsize) {
                 SatEncoder sat_encoder;
                 for (size_t j = 0; j < 10; j++) { // 10 runs with same params for representative sample
@@ -192,7 +187,7 @@ TEST_F(SatEncoderBenchmarking, GrowingCircuitSizeForFixedQubitsGenerators) { // 
                     if (depth != 1U || j != 0U) {
                         outfile << ", ";
                     }
-                    sat_encoder.checkSatisfiability(circOne, inputs);
+                    sat_encoder.checkSatisfiability(circOne);
                     outfile << sat_encoder.to_json().dump(2U);
                 }
             }
@@ -260,7 +255,7 @@ TEST_F(SatEncoderBenchmarking, EquivalenceCheckingGrowingNrOfQubits) { // Equiva
                 inputs.emplace_back(ipts.at(distr(gen2)));
             }
 
-            bool result = true;
+            bool result;
             do {
                 qc::RandomCliffordCircuit circThree(qubitCnt, depth, gen());
                 qc::CircuitOptimizer::flattenOperations(circThree);
