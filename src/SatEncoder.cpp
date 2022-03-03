@@ -48,12 +48,10 @@ void SatEncoder::checkSatisfiability(qc::QuantumComputation& circuitOne, const s
     z3::solver  solver(ctx);
     constructSatInstance(circRep, solver);
 
-    bool sat          = this->isSatisfiable(solver);
-    stats.satisfiable = sat;
+    stats.satisfiable = this->isSatisfiable(solver);
 }
 
 bool SatEncoder::isSatisfiable(z3::solver& solver) {
-    bool result            = false;
     stats.satisfiable      = false;
     auto before            = std::chrono::high_resolution_clock::now();
     auto sat               = solver.check();
@@ -63,7 +61,6 @@ bool SatEncoder::isSatisfiable(z3::solver& solver) {
 
     if (sat == z3::check_result::sat) {
         stats.satisfiable = true;
-        result            = true;
     }
 
     for (size_t i = 0; i < solver.statistics().size(); i++) {
@@ -76,7 +73,7 @@ bool SatEncoder::isSatisfiable(z3::solver& solver) {
         }
         stats.z3StatsMap.emplace(key, val);
     }
-    return result;
+    return stats.satisfiable;
 }
 
 SatEncoder::CircuitRepresentation SatEncoder::preprocessCircuit(const qc::DAG& dag, const std::vector<std::string>& inputs) {
@@ -389,21 +386,18 @@ std::vector<std::vector<bool>> SatEncoder::QState::getLevelGenerator() const {
 SatEncoder::QState SatEncoder::initializeState(unsigned long nrOfQubits, const std::string& input) {
     SatEncoder::QState result;
     result.n = nrOfQubits;
-    std::vector<std::vector<bool>> tx(nrOfQubits, std::vector<bool>(nrOfQubits));
-    std::vector<std::vector<bool>> tz(nrOfQubits, std::vector<bool>(nrOfQubits));
-    std::vector<int>               tr(nrOfQubits, 0);
+    result.x = std::vector<std::vector<bool>>(nrOfQubits, std::vector<bool>(nrOfQubits));
+    result.z = std::vector<std::vector<bool>>(nrOfQubits, std::vector<bool>(nrOfQubits));
+    result.r = std::vector<int>(nrOfQubits, 0);
 
     for (std::size_t i = 0U; i < nrOfQubits; i++) {
         for (std::size_t j = 0U; j < nrOfQubits; j++) {
             if (i == j) {
-                tz[i][j] = true; // initial 0..0 state corresponds to x matrix all zero and z matrix = Id_n
+                result.z[i][j] = true; // initial 0..0 state corresponds to x matrix all zero and z matrix = Id_n
             }
         }
     }
 
-    result.x = tx;
-    result.z = tz;
-    result.r = tr;
     if (!input.empty()) { //
         for (std::size_t i = 0U; i < input.length(); i++) {
             switch (input[i]) {
