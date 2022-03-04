@@ -14,7 +14,7 @@ target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_17)
 set_target_properties(${PROJECT_NAME} PROPERTIES CMAKE_CXX_STANDARD_REQUIRED ON CXX_EXTENSIONS OFF)
 
 # add JKQ::qfr library
-target_link_libraries(${PROJECT_NAME} PUBLIC JKQ::qfr)
+target_link_libraries(${PROJECT_NAME} PUBLIC MQT::qfr)
 
 # add z3 SMT solver
 target_link_libraries(${PROJECT_NAME} PUBLIC z3::z3lib)
@@ -60,3 +60,4 @@ endif()
 
 # add MQT alias
 add_library(MQT::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
+set(CMAKE_CXX_FLAGS " ${CMAKE_CXX_FLAGS_INIT} -std=c++11 -fPIC")
