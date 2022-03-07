@@ -168,7 +168,9 @@ TEST_F(SatEncoderBenchmarking, GrowingCircuitSizeForFixedQubits) { // scaling wr
 
 TEST_F(SatEncoderBenchmarking, GrowingCircuitSizeForFixedQubitsGenerators) { // generators wrt circsize
     try {
-        std::vector<std::size_t> qubits = {1, 2, 3};
+        // Paper Evaluation:
+        // std::vector<std::size_t> qubits = {1,2,3};
+        std::vector<std::size_t> qubits = {2};
         for (unsigned long nrOfQubits: qubits) {
             std::size_t depth = 1U;
             // Paper Evaluation:
