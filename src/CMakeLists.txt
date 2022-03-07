@@ -14,6 +14,9 @@ set_target_properties(${PROJECT_NAME} PROPERTIES CMAKE_CXX_STANDARD_REQUIRED ON 
 add_subdirectory("${PROJECT_SOURCE_DIR}/extern/qfr" "extern/qfr")
 target_link_libraries(${PROJECT_NAME} PUBLIC MQT::qfr)
 
+# add z3 SMT solver
+target_link_libraries(${PROJECT_NAME} PUBLIC z3::z3lib)
+
 # enable interprocedural optimization if it is supported
 include(CheckIPOSupported)
 check_ipo_supported(RESULT ipo_supported)
@@ -55,10 +58,3 @@ endif ()
 
 # add MQT alias
 add_library(MQT::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
-
-if (Z3_FOUND)
-    # add Z3 library
-    target_link_libraries(${PROJECT_NAME} PUBLIC z3::z3lib)
-else ()
-    message(WARNING "Z3 library not found. Exact mapping library cannot be built without Z3 and will thus not be availbale as target")
-endif ()
