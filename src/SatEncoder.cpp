@@ -430,6 +430,9 @@ SatEncoder::QState SatEncoder::initializeState(unsigned long nrOfQubits, const s
     }
     return result;
 }
+const Statistics& SatEncoder::getStats() const {
+    return stats;
+}
 
 void SatEncoder::QState::applyCNOT(unsigned long control, unsigned long target) {
     if (target > n || control > n) {
@@ -481,7 +484,7 @@ void SatEncoder::QState::printStateTableau() {
     std::cout << std::endl;
 }
 
-json SatEncoder::Statistics::to_json() const {
+json Statistics::to_json() const {
     return json{
             {"numGates", nrOfGates},
             {"nrOfQubits", nrOfQubits},
@@ -500,7 +503,7 @@ json SatEncoder::Statistics::to_json() const {
     };
 }
 
-void SatEncoder::Statistics::from_json(const json& j) {
+void Statistics::from_json(const json& j) {
     j.at("numGates").get_to(nrOfGates);
     j.at("nrOfQubits").get_to(nrOfQubits);
     j.at("numSatVarsCreated").get_to(nrOfSatVars);

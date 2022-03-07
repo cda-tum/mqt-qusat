@@ -34,7 +34,7 @@ class CMakeBuild(build_ext):
 
         cmake_args = ['-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=' + extdir,
                       '-DPYTHON_EXECUTABLE=' + sys.executable,
-                      '-DBINDINGS=ON',
+                      '-DBINDINGS=ON'
                       ]
 
         cfg = 'Debug' if self.debug else 'Release'
@@ -67,7 +67,7 @@ class CMakeBuild(build_ext):
         if not os.path.exists(self.build_temp):
             os.makedirs(self.build_temp)
         subprocess.check_call(['cmake', ext.sourcedir] + cmake_args, cwd=self.build_temp, env=env)
-        subprocess.check_call(['cmake','--build', '.', '--target', ext.name] + build_args, cwd=self.build_temp)
+        subprocess.check_call(['cmake', '--build', '.', '--target', ext.name] + build_args, cwd=self.build_temp)
 
 
 README_PATH = os.path.join(os.path.abspath(os.path.dirname(__file__)),
@@ -77,7 +77,7 @@ with open(README_PATH) as readme_file:
 
 setup(
     name='mqt.qusat',
-    version='0.0.1',
+    version='0.1.0',
     author='Lucas Berent',
     author_email='lucas.berent@tum.de',
     description='MQT QuSAT - A Tool for Utilizing SAT in Quantum Computing Written in C++',
@@ -104,7 +104,6 @@ setup(
     keywords="mqt quantum satisfiability",
     project_urls={
         'Source': 'https://github.com/lucasberent/qsatencoder',
-        'Tracker': 'https://github.com/lucasberent/qsatencoder/issues',
-        'Research': 'https://github.com/lucasberent/qsatencoder',
+        'Tracker': 'https://github.com/lucasberent/qsatencoder/issues'
     }
 )

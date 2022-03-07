@@ -11,6 +11,44 @@
 
 using json = nlohmann::json;
 
+struct Statistics {
+    std::size_t                   nrOfGates            = 0U;
+    std::size_t                   nrOfQubits           = 0U;
+    std::size_t                   nrOfSatVars          = 0U;
+    std::size_t                   nrOfGenerators       = 0U;
+    std::size_t                   nrOfFunctionalConstr = 0U;
+    std::size_t                   circuitDepth         = 0U;
+    std::size_t                   nrOfDiffInputStates  = 0U;
+    std::map<std::string, double> z3StatsMap;
+    bool                          equal               = false;
+    bool                          satisfiable         = false;
+    std::size_t                   preprocTime         = 0U;
+    std::size_t                   solvingTime         = 0U;
+    std::size_t                   satConstructionTime = 0U;
+
+    [[nodiscard]] json to_json() const;
+
+    void from_json(const json& j);
+
+    [[nodiscard]] std::string toString() const {
+        std::stringstream ss{};
+        ss << nrOfGates << " gates, ";
+        ss << nrOfQubits << " qubits, ";
+        ss << nrOfSatVars << " sat variables, ";
+        ss << nrOfGenerators << " generators, ";
+        ss << nrOfFunctionalConstr << " functional constriants, ";
+        ss << circuitDepth << " depth, ";
+        ss << nrOfDiffInputStates << " input states, ";
+        for (auto [key, val]: z3StatsMap) {
+            ss << val << key << ", ";
+        }
+        ss << equal << " equivalent, ";
+        ss << preprocTime << " preprocessing time, ";
+        ss << solvingTime << " solving time, ";
+        ss << satConstructionTime << " SAT instance construction time";
+        return ss.str();
+    }
+};
 class SatEncoder {
 public:
     /**
@@ -50,29 +88,10 @@ public:
      */
     void checkSatisfiability(qc::QuantumComputation& circuitOne);
 
-    [[nodiscard]] json to_json() const { return stats.to_json(); }
+    [[nodiscard]] json              to_json() const { return stats.to_json(); }
+    [[nodiscard]] const Statistics& getStats() const;
 
 private:
-    struct Statistics {
-        std::size_t                   nrOfGates            = 0U;
-        std::size_t                   nrOfQubits           = 0U;
-        std::size_t                   nrOfSatVars          = 0U;
-        std::size_t                   nrOfGenerators       = 0U;
-        std::size_t                   nrOfFunctionalConstr = 0U;
-        std::size_t                   circuitDepth         = 0U;
-        std::size_t                   nrOfDiffInputStates  = 0U;
-        std::map<std::string, double> z3StatsMap;
-        bool                          equal               = false;
-        bool                          satisfiable         = false;
-        std::size_t                   preprocTime         = 0U;
-        std::size_t                   solvingTime         = 0U;
-        std::size_t                   satConstructionTime = 0U;
-
-        [[nodiscard]] json to_json() const;
-
-        void from_json(const json& j);
-    };
-
     struct QState {
         unsigned long                  n;
         std::vector<std::vector<bool>> x;

@@ -5,55 +5,124 @@
 
 #include "SatEncoder.hpp"
 #include "pybind11/pybind11.h"
-#include "pybind11/stl.h"
-#include "pybind11_json/pybind11_json.hpp"
 #include "qiskit/QuantumCircuit.hpp"
+#include <pybind11/stl.h>
 
 namespace py = pybind11;
 namespace nl = nlohmann;
 using namespace pybind11::literals;
 
-bool checkEquivalent(const py::object&              circ1,
-                     const py::object&              circ2,
-                     const std::vector<std::string>& inputs) {
-    qc::QuantumComputation qc1{};
+void importQuantumComputation(qc::QuantumComputation& qc, const py::object& circ) {
+    if (py::isinstance<py::str>(circ)) {
+        auto&& file2 = circ.cast<std::string>();
+        qc.import(file2);
+    } else {
+        qc::qiskit::QuantumCircuit::import(qc, circ);
+    }
+}
+
+py::dict checkEquivalent(const py::object&               circ1,
+                         const py::object&               circ2,
+                         const std::vector<std::string>& inputs) {
+    qc::QuantumComputation qc1{}, qc2{};
+    py::dict               results{};
     try {
-        if (py::isinstance<py::str>(circ1)) {
-            auto&& file1 = circ1.cast<std::string>();
-            qc1.import(file1);
-        } else {
-            qc::qiskit::QuantumCircuit::import(qc1, circ1);
-        }
+        importQuantumComputation(qc1, circ1);
+        importQuantumComputation(qc2, circ2);
     } catch (std::exception const& e) {
-        py::print("Could not import first circuit: ", e.what());
-        return false;
+        py::print("Could not import circuitt: ", e.what());
+        return {};
     }
 
-    qc::QuantumComputation qc2{};
-    try {
-        if (py::isinstance<py::str>(circ2)) {
-            auto&& file2 = circ2.cast<std::string>();
-            qc2.import(file2);
-        } else {
-            qc::qiskit::QuantumCircuit::import(qc2, circ2);
-        }
-    } catch (std::exception const& e) {
-        py::print("Could not import second circuit: ", e.what());
-        return false;
-    }
     SatEncoder encoder{};
     try {
-        return encoder.testEqual(qc1, qc2, inputs);
+        results["equivalent"] = encoder.testEqual(qc1, qc2, inputs);
     } catch (std::exception const& e) {
         py::print("Could not check equivalence: ", e.what());
-        return false;
+        return {};
     }
+    results["statistics"] = encoder.getStats();
+    return results;
+}
+
+py::dict checkEquivalent(const py::object& circ1,
+                         const py::object& circ2) {
+    return checkEquivalent(circ1, circ2, {});
 }
 
 PYBIND11_MODULE(pyqusat, m) {
     m.doc() = "Python interface for the MQT QuSAT quantum circuit satisfiability tool";
-    m.def("checkEquivalent", &checkEquivalent, "check the equivalence of two clifford circuits for the given inputs",
+    py::class_<Statistics>(m, "Statistics", "Statistics of the SAT solver")
+            .def_readwrite(
+                    "gates", &Statistics::nrOfGates,
+                    R"pbdoc(
+					Number of Gates
+				)pbdoc")
+            .def_readwrite(
+                    "n_qubits", &Statistics::nrOfQubits,
+                    R"pbdoc(
+					Number of Qubits
+				)pbdoc")
+            .def_readwrite(
+                    "n_sat_variables", &Statistics::nrOfSatVars,
+                    R"pbdoc(
+					Number of SAT variables
+				)pbdoc")
+            .def_readwrite(
+                    "n_generators", &Statistics::nrOfGenerators,
+                    R"pbdoc(
+					Number of Generators
+				)pbdoc")
+            .def_readwrite(
+                    "n_functional_constraints", &Statistics::nrOfFunctionalConstr,
+                    R"pbdoc(
+					Number of Functional Constraints
+				)pbdoc")
+            .def_readwrite(
+                    "circuit_depth", &Statistics::circuitDepth,
+                    R"pbdoc(
+					Number of Depth
+				)pbdoc")
+            .def_readwrite(
+                    "z3_statistics", &Statistics::z3StatsMap,
+                    R"pbdoc(
+					Additional Statistics as reported by Z3
+				)pbdoc")
+            .def_readwrite(
+                    "n_input_states", &Statistics::nrOfDiffInputStates,
+                    R"pbdoc(
+					Number of Input States
+				)pbdoc")
+            .def_readwrite(
+                    "equivalent", &Statistics::equal,
+                    R"pbdoc(
+					If the two circuits are equivalent
+				)pbdoc")
+            .def_readwrite(
+                    "satisfiable", &Statistics::satisfiable,
+                    R"pbdoc(
+					If the SAT instance is satisfiable
+				)pbdoc")
+            .def_readwrite(
+                    "preprocessing_time", &Statistics::preprocTime,
+                    R"pbdoc(
+					Preprocessing time (ms)
+				)pbdoc")
+            .def_readwrite(
+                    "solving_time", &Statistics::solvingTime,
+                    R"pbdoc(
+					SAT solving time (ms)
+				)pbdoc")
+            .def_readwrite(
+                    "sat_construction_time", &Statistics::satConstructionTime,
+                    R"pbdoc(
+					SAT construction time (ms)
+				)pbdoc")
+            .def("__repr__", &Statistics::toString);
+
+    m.def("checkEquivalent", py::overload_cast<const py::object&, const py::object&, const std::vector<std::string>&>(&checkEquivalent), "check the equivalence of two clifford circuits for the given inputs",
           "circ1"_a, "circ2"_a, "inputs"_a);
+    m.def("checkEquivalent", py::overload_cast<const py::object&, const py::object&>(&checkEquivalent), "check the equivalence of two clifford circuits for the all zero state as single input");
 
 #ifdef VERSION_INFO
     m.attr("__version__") = VERSION_INFO;
