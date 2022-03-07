@@ -7,7 +7,7 @@
 
 QuSAT is part of the Munich Quantum Toolkit (MQT) and provides methods for utilizing satisfiability techniques in quantum computing based on methods proposed in:
 
- - [[1]](#towards-a-satisfiability-encoding-for-quantum-circuits) L. Berent, L. Burgholzer, and R. Wille. Towards a Satisfiability Encoding for Quantum Circuits. 2022.
+ - [[1]](https://arxiv.org/abs/2203.00698) L. Berent, L. Burgholzer, and R. Wille. Towards a Satisfiability Encoding for Quantum Circuits. 2022.
 
 The project is in active development and can currently be used to 
  - Encode Clifford circuits in SAT
@@ -65,3 +65,16 @@ cmake --build build
 ```
 This tries to build the project in the `build` directory (passed via `--build`).
 Some operating systems and developer environments explicitly require a configuration to be set, which is why the `--config` flag is also passed to the build command. The flag `--parallel <NUMBER_OF_THREADS>` may be added to trigger a parallel build.
+
+# Reference
+If you use our tool for your research, we will be thankful if you refer to it by citing the appropriate publication:
+```
+@misc{berent2022sat,
+      title={Towards a SAT Encoding for Quantum Circuits: A Journey From Classical Circuits to Clifford Circuits and Beyond}, 
+      author={Lucas Berent and Lukas Burgholzer and Robert Wille},
+      year={2022},
+      eprint={2203.00698},
+      archivePrefix={arXiv},
+      primaryClass={quant-ph}
+}
+```
