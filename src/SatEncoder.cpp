@@ -192,18 +192,28 @@ void SatEncoder::constructSatInstance(const SatEncoder::CircuitRepresentation& c
     auto before = std::chrono::high_resolution_clock::now();
     // number of unique generators that need to be encoded
     const auto generatorCnt = generators.size();
-    stats.nrOfGenerators    = generatorCnt;
-
+    if (generatorCnt < 1) {
+        std::cerr << "Zero generators computed" << std::endl;
+        return;
+    }
+    stats.nrOfGenerators = generatorCnt;
     // bitwidth required to encode the generators
     const auto bitwidth = static_cast<std::size_t>(std::ceil(std::log2(generatorCnt)));
-
+    if (bitwidth < 1) {
+        std::cerr << "Bitwidth 0 computed" << std::endl;
+        return;
+    }
     // whether the number of generators is a power of two or not
     bool blockingConstraintsNeeded = std::log2(generatorCnt) < static_cast<double>(bitwidth);
 
     // z3 context used throughout this function
     auto& ctx = solver.ctx();
 
-    const auto            depth = circuitRepresentation.generatorMappings.size();
+    const auto depth = circuitRepresentation.generatorMappings.size();
+    if (depth < 1) {
+        std::cerr << "No generator mappings found, input state is the only state" << std::endl;
+        return;
+    }
     std::vector<z3::expr> vars{};
     vars.reserve(depth + 1U);
     std::string bvName = "x^";
@@ -246,9 +256,17 @@ void SatEncoder::constructMiterInstance(const SatEncoder::CircuitRepresentation&
     auto before = std::chrono::high_resolution_clock::now();
     // number of unique generators that need to be encoded
     const auto generatorCnt = generators.size();
-    stats.nrOfGenerators    = generatorCnt;
+    if (generatorCnt < 1) {
+        std::cerr << "Zero generators computed" << std::endl;
+        return;
+    }
+    stats.nrOfGenerators = generatorCnt;
     // bitwidth required to encode the generators
     const auto bitwidth = static_cast<std::size_t>(std::ceil(std::log2(generatorCnt)));
+    if (bitwidth < 1) {
+        std::cerr << "Bitwidth 0 computed" << std::endl;
+        return;
+    }
 
     // whether the number of generators is a power of two or not
     bool blockingConstraintsNeeded = std::log2(generatorCnt) < static_cast<double>(bitwidth);
@@ -256,7 +274,11 @@ void SatEncoder::constructMiterInstance(const SatEncoder::CircuitRepresentation&
     auto& ctx = solver.ctx();
 
     /// encode first circuit
-    const auto            depthOne = circOneRep.generatorMappings.size();
+    const auto depthOne = circOneRep.generatorMappings.size();
+    if (depthOne < 1) {
+        std::cerr << "No generator mappings computed, input state is the only state" << std::endl;
+        return;
+    }
     std::vector<z3::expr> varsOne{};
     varsOne.reserve(depthOne + 1U);
     std::string bvName = "x^";
@@ -292,7 +314,11 @@ void SatEncoder::constructMiterInstance(const SatEncoder::CircuitRepresentation&
         }
     }
     /// encode second circuit
-    auto                  depthTwo = circTwoRep.generatorMappings.size();
+    auto depthTwo = circTwoRep.generatorMappings.size();
+    if (depthTwo < 1) {
+        std::cerr << "No generator mappings computed for second circuit" << std::endl;
+        return;
+    }
     std::vector<z3::expr> varsTwo{};
     varsOne.reserve(depthTwo + 1U);
     bvName = "x'^";
