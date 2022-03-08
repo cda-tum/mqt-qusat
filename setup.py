@@ -90,7 +90,7 @@ setup(
     zip_safe=False,
     packages=find_namespace_packages(include=['mqt.*']),
     classifiers=[
-        'Development Status :: 5 - Production/Stable',
+        'Development Status :: 4 - Beta',
         "Programming Language :: Python :: 3",
         "Programming Language :: C++",
         "License :: OSI Approved :: MIT License",
