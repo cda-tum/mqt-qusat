@@ -105,8 +105,8 @@ TEST_F(SatEncoderBenchmarking, GrowingNrOfQubitsForFixedDepth) { // scaling wrt 
             outfile << "{ \"benchmarks\" : [";
 
             for (; nrOfQubits < maxNrOfQubits; nrOfQubits += stepsize) {
-                SatEncoder satEncoder;
                 for (size_t j = 0; j < 10; j++) { // 10 runs with same params for representative sample
+                    SatEncoder                satEncoder;
                     qc::RandomCliffordCircuit circOne(nrOfQubits, depth, rd());
                     qc::CircuitOptimizer::flattenOperations(circOne);
                     if (nrOfQubits != 1U || j != 0U) {
@@ -146,8 +146,8 @@ TEST_F(SatEncoderBenchmarking, GrowingCircuitSizeForFixedQubits) { // scaling wr
             std::ofstream outfile(benchmarkFilesPath + "CS-" + std::to_string(nrOfQubits) + "-" + filename + ".json");
             outfile << "{ \"benchmarks\" : [";
             for (; depth <= maxDepth; depth += stepsize) {
-                SatEncoder satEncoder;
                 for (size_t j = 0; j < 10; j++) { // 10 runs with same params for representative sample
+                    SatEncoder                satEncoder;
                     qc::RandomCliffordCircuit circOne(nrOfQubits, depth, rd());
                     qc::CircuitOptimizer::flattenOperations(circOne);
                     if (depth != 1U || j != 0U) {
@@ -187,8 +187,8 @@ TEST_F(SatEncoderBenchmarking, GrowingCircuitSizeForFixedQubitsGenerators) { // 
             std::ofstream outfile(benchmarkFilesPath + "G-" + std::to_string(nrOfQubits) + "-" + filename + ".json");
             outfile << "{ \"benchmarks\" : [";
             for (; depth <= maxDepth; depth += stepsize) {
-                SatEncoder satEncoder;
                 for (size_t j = 0; j < 10; j++) { // 10 runs with same params for representative sample
+                    SatEncoder                satEncoder;
                     qc::RandomCliffordCircuit circOne(nrOfQubits, depth, rd());
                     qc::CircuitOptimizer::flattenOperations(circOne);
                     if (depth != 1U || j != 0U) {
@@ -264,14 +264,15 @@ TEST_F(SatEncoderBenchmarking, EquivalenceCheckingGrowingNrOfQubits) { // Equiva
 
             bool result;
             do {
+                SatEncoder                satEncoder1;
                 qc::RandomCliffordCircuit circThree(qubitCnt, depth, gen());
                 qc::CircuitOptimizer::flattenOperations(circThree);
                 auto                            circFour = circThree.clone();
                 std::uniform_int_distribution<> distr2(0, circFour.size()); // random error location in circuit
                 circFour.erase(circFour.begin() + distr2(gen));
                 outfile << ", ";
-                result = satEncoder.testEqual(circThree, circFour, inputs); // non-equivalent case
-                outfile << satEncoder.to_json().dump(2U);
+                result = satEncoder1.testEqual(circThree, circFour, inputs); // non-equivalent case
+                outfile << satEncoder1.to_json().dump(2U);
             } while (result);
         }
         outfile << "]}";

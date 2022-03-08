@@ -1,17 +1,16 @@
 #
 # This file is part of the JKQ QMAP library which is released under the MIT license.
-# See file README.md or go to https://iic.jku.at/eda/research/ibm_qx_mapping/ for more information.
+# See file README.md or go to https://github.com/lucasberent/qsatencoder for more information.
 #
 
 import csv
 import math
 import statistics
-import numpy as np
-import scipy.optimize as opt
 
 import matplotlib.pyplot as plt
+import numpy as np
 import pandas as pd
-
+import scipy.optimize as opt
 from mpl_toolkits.axes_grid1.inset_locator import InsetPosition, mark_inset
 
 
@@ -430,6 +429,6 @@ def plotGenerators():
     plt.show()
 
 
-# plotScaling()
+plotScaling()
 plotGenerators()
-#plotEC()
+plotEC()
