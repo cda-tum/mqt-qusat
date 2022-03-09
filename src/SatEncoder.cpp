@@ -496,38 +496,3 @@ void SatEncoder::QState::printStateTableau() {
     }
     std::cout << std::endl;
 }
-
-json Statistics::to_json() const {
-    return json{
-            {"numGates", nrOfGates},
-            {"nrOfQubits", nrOfQubits},
-            {"numSatVarsCreated", nrOfSatVars},
-            {"numGenerators", nrOfGenerators},
-            {"numFuncConstr", nrOfFunctionalConstr},
-            {"circDepth", circuitDepth},
-            {"numInputs", nrOfDiffInputStates},
-            {"equivalent", equal},
-            {"satisfiable", satisfiable},
-            {"preprocTime", preprocTime},
-            {"solvingTime", solvingTime},
-            {"satConstructionTime", satConstructionTime},
-            {"z3map", z3StatsMap}
-
-    };
-}
-
-void Statistics::from_json(const json& j) {
-    j.at("numGates").get_to(nrOfGates);
-    j.at("nrOfQubits").get_to(nrOfQubits);
-    j.at("numSatVarsCreated").get_to(nrOfSatVars);
-    j.at("numGenerators").get_to(nrOfGenerators);
-    j.at("numFuncConstr").get_to(nrOfFunctionalConstr);
-    j.at("circDepth").get_to(circuitDepth);
-    j.at("numInputs").get_to(nrOfDiffInputStates);
-    j.at("equivalent").get_to(equal);
-    j.at("satisfiable").get_to(satisfiable);
-    j.at("preprocTime").get_to(preprocTime);
-    j.at("solvingTime").get_to(solvingTime);
-    j.at("satConstructionTime").get_to(satConstructionTime);
-    j.at("z3map").get_to(z3StatsMap);
-}
