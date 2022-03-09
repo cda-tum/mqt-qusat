@@ -60,6 +60,19 @@ TEST_F(SatEncoderTest, CheckEqualWhenEqualRandomCircuitsWithInputs) {
     bool result = satEncoder.testEqual(circOne, circTwo, inputs);
     EXPECT_EQ(result, true);
 }
+TEST_F(SatEncoderTest, CheckSATConstructionWithSmallCircuit) {
+    std::random_device        rd;
+    std::mt19937              gen(rd());
+    qc::RandomCliffordCircuit circOne(1, 1, gen());
+    qc::CircuitOptimizer::flattenOperations(circOne);
+
+    SatEncoder satEncoder;
+
+    std::string filename{};
+
+    bool result = satEncoder.checkSatisfiability(circOne);
+    EXPECT_EQ(result, true);
+}
 
 /* Benchmarking */
 std::vector<std::string> getAllCompBasisStates(std::size_t nrQubits) {

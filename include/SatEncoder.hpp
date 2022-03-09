@@ -42,14 +42,14 @@ public:
      * @param inputs input states to consider. In stabilizer representation, e.g., ZZ == |00>. If empty all-zero state is
      * assumed.
      */
-    void checkSatisfiability(qc::QuantumComputation& circuitOne, const std::vector<std::string>& inputs);
+    bool checkSatisfiability(qc::QuantumComputation& circuitOne, const std::vector<std::string>& inputs);
 
     /**
      * Constructs SAT instance for input circuit and checks satisfiability with all zero state as single
      * input state
      * @param circuitOne circuit to construct SAT instance for
      */
-    void checkSatisfiability(qc::QuantumComputation& circuitOne);
+    bool checkSatisfiability(qc::QuantumComputation& circuitOne);
 
     [[nodiscard]] json              to_json() const { return stats.to_json(); }
     [[nodiscard]] const Statistics& getStats() const;

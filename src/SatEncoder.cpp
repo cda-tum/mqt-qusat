@@ -30,15 +30,15 @@ bool SatEncoder::testEqual(qc::QuantumComputation& circuitOne, qc::QuantumComput
     return testEqual(circuitOne, circuitTwo, inputs);
 }
 
-void SatEncoder::checkSatisfiability(qc::QuantumComputation& circuitOne) {
+bool SatEncoder::checkSatisfiability(qc::QuantumComputation& circuitOne) {
     std::vector<std::string> inputs;
     return checkSatisfiability(circuitOne, inputs);
 }
 
-void SatEncoder::checkSatisfiability(qc::QuantumComputation& circuitOne, const std::vector<std::string>& inputs) {
+bool SatEncoder::checkSatisfiability(qc::QuantumComputation& circuitOne, const std::vector<std::string>& inputs) {
     if (!isClifford(circuitOne)) {
         std::cerr << "Circuit is not Clifford Circuit." << std::endl;
-        return;
+        return false;
     }
     stats.nrOfDiffInputStates = inputs.size();
     stats.nrOfQubits          = circuitOne.getNqubits();
@@ -49,6 +49,7 @@ void SatEncoder::checkSatisfiability(qc::QuantumComputation& circuitOne, const s
     constructSatInstance(circRep, solver);
 
     stats.satisfiable = this->isSatisfiable(solver);
+    return stats.satisfiable;
 }
 
 bool SatEncoder::isSatisfiable(z3::solver& solver) {
