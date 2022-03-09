@@ -60,6 +60,19 @@ TEST_F(SatEncoderTest, CheckEqualWhenEqualRandomCircuitsWithInputs) {
     bool result = satEncoder.testEqual(circOne, circTwo, inputs);
     EXPECT_EQ(result, true);
 }
+TEST_F(SatEncoderTest, CheckSATConstructionWithSmallCircuit) {
+    std::random_device        rd;
+    std::mt19937              gen(rd());
+    qc::RandomCliffordCircuit circOne(1, 1, gen());
+    qc::CircuitOptimizer::flattenOperations(circOne);
+
+    SatEncoder satEncoder;
+
+    std::string filename{};
+
+    bool result = satEncoder.checkSatisfiability(circOne);
+    EXPECT_EQ(result, true);
+}
 
 /* Benchmarking */
 std::vector<std::string> getAllCompBasisStates(std::size_t nrQubits) {
@@ -105,8 +118,8 @@ TEST_F(SatEncoderBenchmarking, GrowingNrOfQubitsForFixedDepth) { // scaling wrt 
             outfile << "{ \"benchmarks\" : [";
 
             for (; nrOfQubits < maxNrOfQubits; nrOfQubits += stepsize) {
-                SatEncoder satEncoder;
                 for (size_t j = 0; j < 10; j++) { // 10 runs with same params for representative sample
+                    SatEncoder                satEncoder;
                     qc::RandomCliffordCircuit circOne(nrOfQubits, depth, rd());
                     qc::CircuitOptimizer::flattenOperations(circOne);
                     if (nrOfQubits != 1U || j != 0U) {
@@ -146,8 +159,8 @@ TEST_F(SatEncoderBenchmarking, GrowingCircuitSizeForFixedQubits) { // scaling wr
             std::ofstream outfile(benchmarkFilesPath + "CS-" + std::to_string(nrOfQubits) + "-" + filename + ".json");
             outfile << "{ \"benchmarks\" : [";
             for (; depth <= maxDepth; depth += stepsize) {
-                SatEncoder satEncoder;
                 for (size_t j = 0; j < 10; j++) { // 10 runs with same params for representative sample
+                    SatEncoder                satEncoder;
                     qc::RandomCliffordCircuit circOne(nrOfQubits, depth, rd());
                     qc::CircuitOptimizer::flattenOperations(circOne);
                     if (depth != 1U || j != 0U) {
@@ -168,7 +181,9 @@ TEST_F(SatEncoderBenchmarking, GrowingCircuitSizeForFixedQubits) { // scaling wr
 
 TEST_F(SatEncoderBenchmarking, GrowingCircuitSizeForFixedQubitsGenerators) { // generators wrt circsize
     try {
-        std::vector<std::size_t> qubits = {1, 2, 3};
+        // Paper Evaluation:
+        // std::vector<std::size_t> qubits = {1,2,3};
+        std::vector<std::size_t> qubits = {2};
         for (unsigned long nrOfQubits: qubits) {
             std::size_t depth = 1U;
             // Paper Evaluation:
@@ -185,8 +200,8 @@ TEST_F(SatEncoderBenchmarking, GrowingCircuitSizeForFixedQubitsGenerators) { // 
             std::ofstream outfile(benchmarkFilesPath + "G-" + std::to_string(nrOfQubits) + "-" + filename + ".json");
             outfile << "{ \"benchmarks\" : [";
             for (; depth <= maxDepth; depth += stepsize) {
-                SatEncoder satEncoder;
                 for (size_t j = 0; j < 10; j++) { // 10 runs with same params for representative sample
+                    SatEncoder                satEncoder;
                     qc::RandomCliffordCircuit circOne(nrOfQubits, depth, rd());
                     qc::CircuitOptimizer::flattenOperations(circOne);
                     if (depth != 1U || j != 0U) {
@@ -262,14 +277,15 @@ TEST_F(SatEncoderBenchmarking, EquivalenceCheckingGrowingNrOfQubits) { // Equiva
 
             bool result;
             do {
+                SatEncoder                satEncoder1;
                 qc::RandomCliffordCircuit circThree(qubitCnt, depth, gen());
                 qc::CircuitOptimizer::flattenOperations(circThree);
                 auto                            circFour = circThree.clone();
                 std::uniform_int_distribution<> distr2(0, circFour.size()); // random error location in circuit
                 circFour.erase(circFour.begin() + distr2(gen));
                 outfile << ", ";
-                result = satEncoder.testEqual(circThree, circFour, inputs); // non-equivalent case
-                outfile << satEncoder.to_json().dump(2U);
+                result = satEncoder1.testEqual(circThree, circFour, inputs); // non-equivalent case
+                outfile << satEncoder1.to_json().dump(2U);
             } while (result);
         }
         outfile << "]}";

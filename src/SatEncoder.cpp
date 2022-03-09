@@ -30,15 +30,15 @@ bool SatEncoder::testEqual(qc::QuantumComputation& circuitOne, qc::QuantumComput
     return testEqual(circuitOne, circuitTwo, inputs);
 }
 
-void SatEncoder::checkSatisfiability(qc::QuantumComputation& circuitOne) {
+bool SatEncoder::checkSatisfiability(qc::QuantumComputation& circuitOne) {
     std::vector<std::string> inputs;
     return checkSatisfiability(circuitOne, inputs);
 }
 
-void SatEncoder::checkSatisfiability(qc::QuantumComputation& circuitOne, const std::vector<std::string>& inputs) {
+bool SatEncoder::checkSatisfiability(qc::QuantumComputation& circuitOne, const std::vector<std::string>& inputs) {
     if (!isClifford(circuitOne)) {
         std::cerr << "Circuit is not Clifford Circuit." << std::endl;
-        return;
+        return false;
     }
     stats.nrOfDiffInputStates = inputs.size();
     stats.nrOfQubits          = circuitOne.getNqubits();
@@ -49,6 +49,7 @@ void SatEncoder::checkSatisfiability(qc::QuantumComputation& circuitOne, const s
     constructSatInstance(circRep, solver);
 
     stats.satisfiable = this->isSatisfiable(solver);
+    return stats.satisfiable;
 }
 
 bool SatEncoder::isSatisfiable(z3::solver& solver) {
@@ -192,18 +193,24 @@ void SatEncoder::constructSatInstance(const SatEncoder::CircuitRepresentation& c
     auto before = std::chrono::high_resolution_clock::now();
     // number of unique generators that need to be encoded
     const auto generatorCnt = generators.size();
-    stats.nrOfGenerators    = generatorCnt;
-
+    if (generatorCnt < 1) {
+        std::cerr << "Zero generators computed" << std::endl;
+        return;
+    }
+    stats.nrOfGenerators = generatorCnt;
     // bitwidth required to encode the generators
-    const auto bitwidth = static_cast<std::size_t>(std::ceil(std::log2(generatorCnt)));
-
+    auto bitwidth = static_cast<std::size_t>(std::ceil(std::log2(generatorCnt)));
+    if (bitwidth < 1 && generatorCnt == 1) {
+        bitwidth = 1;
+    }
     // whether the number of generators is a power of two or not
     bool blockingConstraintsNeeded = std::log2(generatorCnt) < static_cast<double>(bitwidth);
 
     // z3 context used throughout this function
     auto& ctx = solver.ctx();
 
-    const auto            depth = circuitRepresentation.generatorMappings.size();
+    const auto depth = circuitRepresentation.generatorMappings.size();
+
     std::vector<z3::expr> vars{};
     vars.reserve(depth + 1U);
     std::string bvName = "x^";
@@ -246,9 +253,16 @@ void SatEncoder::constructMiterInstance(const SatEncoder::CircuitRepresentation&
     auto before = std::chrono::high_resolution_clock::now();
     // number of unique generators that need to be encoded
     const auto generatorCnt = generators.size();
-    stats.nrOfGenerators    = generatorCnt;
+    if (generatorCnt < 1) {
+        std::cerr << "Zero generators computed" << std::endl;
+        return;
+    }
+    stats.nrOfGenerators = generatorCnt;
     // bitwidth required to encode the generators
-    const auto bitwidth = static_cast<std::size_t>(std::ceil(std::log2(generatorCnt)));
+    auto bitwidth = static_cast<std::size_t>(std::ceil(std::log2(generatorCnt)));
+    if (bitwidth < 1 && generatorCnt == 1) {
+        bitwidth = 1;
+    }
 
     // whether the number of generators is a power of two or not
     bool blockingConstraintsNeeded = std::log2(generatorCnt) < static_cast<double>(bitwidth);
@@ -430,6 +444,9 @@ SatEncoder::QState SatEncoder::initializeState(unsigned long nrOfQubits, const s
     }
     return result;
 }
+const Statistics& SatEncoder::getStats() const {
+    return stats;
+}
 
 void SatEncoder::QState::applyCNOT(unsigned long control, unsigned long target) {
     if (target > n || control > n) {
@@ -479,39 +496,4 @@ void SatEncoder::QState::printStateTableau() {
         std::cout << std::endl;
     }
     std::cout << std::endl;
-}
-
-json SatEncoder::Statistics::to_json() const {
-    return json{
-            {"numGates", nrOfGates},
-            {"nrOfQubits", nrOfQubits},
-            {"numSatVarsCreated", nrOfSatVars},
-            {"numGenerators", nrOfGenerators},
-            {"numFuncConstr", nrOfFunctionalConstr},
-            {"circDepth", circuitDepth},
-            {"numInputs", nrOfDiffInputStates},
-            {"equivalent", equal},
-            {"satisfiable", satisfiable},
-            {"preprocTime", preprocTime},
-            {"solvingTime", solvingTime},
-            {"satConstructionTime", satConstructionTime},
-            {"z3map", z3StatsMap}
-
-    };
-}
-
-void SatEncoder::Statistics::from_json(const json& j) {
-    j.at("numGates").get_to(nrOfGates);
-    j.at("nrOfQubits").get_to(nrOfQubits);
-    j.at("numSatVarsCreated").get_to(nrOfSatVars);
-    j.at("numGenerators").get_to(nrOfGenerators);
-    j.at("numFuncConstr").get_to(nrOfFunctionalConstr);
-    j.at("circDepth").get_to(circuitDepth);
-    j.at("numInputs").get_to(nrOfDiffInputStates);
-    j.at("equivalent").get_to(equal);
-    j.at("satisfiable").get_to(satisfiable);
-    j.at("preprocTime").get_to(preprocTime);
-    j.at("solvingTime").get_to(solvingTime);
-    j.at("satConstructionTime").get_to(satConstructionTime);
-    j.at("z3map").get_to(z3StatsMap);
 }

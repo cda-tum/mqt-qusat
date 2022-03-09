@@ -2,6 +2,7 @@
 
 #include "CircuitOptimizer.hpp"
 #include "QuantumComputation.hpp"
+#include "Statistics.hpp"
 
 #include <chrono>
 #include <iostream>
@@ -41,38 +42,19 @@ public:
      * @param inputs input states to consider. In stabilizer representation, e.g., ZZ == |00>. If empty all-zero state is
      * assumed.
      */
-    void checkSatisfiability(qc::QuantumComputation& circuitOne, const std::vector<std::string>& inputs);
+    bool checkSatisfiability(qc::QuantumComputation& circuitOne, const std::vector<std::string>& inputs);
 
     /**
      * Constructs SAT instance for input circuit and checks satisfiability with all zero state as single
      * input state
      * @param circuitOne circuit to construct SAT instance for
      */
-    void checkSatisfiability(qc::QuantumComputation& circuitOne);
+    bool checkSatisfiability(qc::QuantumComputation& circuitOne);
 
-    [[nodiscard]] json to_json() const { return stats.to_json(); }
+    [[nodiscard]] json              to_json() const { return stats.to_json(); }
+    [[nodiscard]] const Statistics& getStats() const;
 
 private:
-    struct Statistics {
-        std::size_t                   nrOfGates            = 0U;
-        std::size_t                   nrOfQubits           = 0U;
-        std::size_t                   nrOfSatVars          = 0U;
-        std::size_t                   nrOfGenerators       = 0U;
-        std::size_t                   nrOfFunctionalConstr = 0U;
-        std::size_t                   circuitDepth         = 0U;
-        std::size_t                   nrOfDiffInputStates  = 0U;
-        std::map<std::string, double> z3StatsMap;
-        bool                          equal               = false;
-        bool                          satisfiable         = false;
-        std::size_t                   preprocTime         = 0U;
-        std::size_t                   solvingTime         = 0U;
-        std::size_t                   satConstructionTime = 0U;
-
-        [[nodiscard]] json to_json() const;
-
-        void from_json(const json& j);
-    };
-
     struct QState {
         unsigned long                  n;
         std::vector<std::vector<bool>> x;
