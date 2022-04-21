@@ -2,7 +2,6 @@ cmake_minimum_required(VERSION 3.14...3.22)
 
 project(qusat
         LANGUAGES CXX
-        VERSION 0.1.0
         DESCRIPTION "A Tool for Utilizing SAT in Quantum Computing"
         )
 

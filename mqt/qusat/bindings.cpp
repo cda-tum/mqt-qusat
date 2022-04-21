@@ -9,6 +9,9 @@
 
 #include <pybind11/stl.h>
 
+#define STRINGIFY(x) #x
+#define MACRO_STRINGIFY(x) STRINGIFY(x)
+
 namespace py = pybind11;
 namespace nl = nlohmann;
 using namespace pybind11::literals;
@@ -74,7 +77,7 @@ PYBIND11_MODULE(pyqusat, m) {
     m.def("checkEquivalence", py::overload_cast<const py::object&, const py::object&>(&checkEquivalence), "check the equivalence of two clifford circuits for the all zero state as single input");
 
 #ifdef VERSION_INFO
-    m.attr("__version__") = VERSION_INFO;
+    m.attr("__version__") = MACRO_STRINGIFY(VERSION_INFO);
 #else
     m.attr("__version__") = "dev";
 #endif
