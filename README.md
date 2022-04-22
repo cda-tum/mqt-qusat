@@ -1,19 +1,24 @@
-[![GitHub Workflow Status](https://img.shields.io/github/workflow/status/lucasberent/qsatencoder/CI?logo=github&style=plastic)](https://github.com/lucasberent/qsatencoder/actions?query=workflow%3A%22CI%22)
-[![Codecov branch](https://img.shields.io/codecov/c/github/lucasberent/qsatencoder/master?label=codecov&logo=codecov&style=plastic)](https://codecov.io/gh/lucasberent/qsatencoder)
-![GitHub](https://img.shields.io/github/license/lucasberent/qsatencoder?style=plastic)
-[![toolset: JKQ](https://img.shields.io/static/v1?label=toolset&message=MQT&color=blue&style=plastic)](https://github.com/lucasberent/qsatencoder)
+[![PyPI](https://img.shields.io/pypi/v/mqt.qusat?logo=pypi&style=flat-square)](https://pypi.org/project/mqt.qusat/)
+![OS](https://img.shields.io/badge/os-linux%20%7C%20macos%20%7C%20windows-blue?style=flat-square)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)](https://opensource.org/licenses/MIT)
+[![CI](https://img.shields.io/github/workflow/status/cda-tum/qusat/CI?style=flat-square&logo=github&label=c%2B%2B)](https://github.com/cda-tum/qusat/actions/workflows/ci.yml)
+[![Bindings](https://img.shields.io/github/workflow/status/cda-tum/qusat/Deploy%20to%20PyPI?style=flat-square&logo=github&label=python)](https://github.com/cda-tum/qusat/actions/workflows/deploy.yml)
+[![codecov](https://img.shields.io/codecov/c/github/cda-tum/qusat?style=flat-square&logo=codecov)](https://codecov.io/gh/cda-tum/qusat)
 
-# MQT QuSAT - A Tool for Utilizing SAT in Quantum Computing Written in C++
+# MQT QuSAT - A Tool for Utilizing SAT in Quantum Computing
 
-QuSAT is part of the Munich Quantum Toolkit (MQT) and provides methods for utilizing satisfiability techniques in quantum computing based on methods proposed in:
+A tool for utilizing satisfiablity testing (SAT) techniques in quantum computing developed by the Chair for Design Automation at
+the [Technical University of Munich](https://www.tum.de/) based on methods proposed in:
 
  - [[1]](https://arxiv.org/abs/2203.00698) L. Berent, L. Burgholzer, and R. Wille. Towards a Satisfiability Encoding for Quantum Circuits. 2022.
+
+QuSAT is part of the Munich Quantum Toolkit (MQT) and builds upon [our quantum functionality representation (QFR)](https://github.com/cda-tum/qfr).
 
 The project is in active development and can currently be used to 
  - Encode Clifford circuits in SAT
  - Check the equivalence of Clifford circuits using SAT
- 
-If you have any questions, feel free to contact us via [iic-quantum@jku.at](mailto:iic-quantum@jku.at) or by creating an issue on [GitHub](https://github.com/lucasberent/qsatencoder/issues).
+
+If you have any questions, feel free to contact us via [quantum.cda@xcit.tum.de](mailto:quantum.cda@xcit.tum.de) or by creating an issue on [GitHub](https://github.com/cda-tum/qusat/issues).
 
 ## Towards a Satisfiability Encoding for Quantum Circuits
 
@@ -48,7 +53,7 @@ The SMT Solver [Z3 >= 4.8.3](https://github.com/Z3Prover/z3) has to be installed
 
 To start off, clone this repository using
 ```shell
-git clone https://github.com/lucasberent/qsatencoder --recursive
+git clone https://github.com/cda-tum/qusat --recursive
 ```
 Note the `--recursive` flag. It is required to also clone all the required submodules.
 If you happen to forget passing the flag on your initial clone, you can initialize all the submodules by executing `git submodule update --init --recursive` in the main project directory.
@@ -67,14 +72,12 @@ This tries to build the project in the `build` directory (passed via `--build`).
 Some operating systems and developer environments explicitly require a configuration to be set, which is why the `--config` flag is also passed to the build command. The flag `--parallel <NUMBER_OF_THREADS>` may be added to trigger a parallel build.
 
 # Reference
-If you use our tool for your research, we will be thankful if you refer to it by citing the appropriate publication:
+If you use our tool for your research, we would appreciate if you refer to it by citing the appropriate publication:
 ```
-@misc{berent2022sat,
+@inproceedings{berent2022sat,
       title={Towards a SAT Encoding for Quantum Circuits: A Journey From Classical Circuits to Clifford Circuits and Beyond}, 
       author={Lucas Berent and Lukas Burgholzer and Robert Wille},
       year={2022},
-      eprint={2203.00698},
-      archivePrefix={arXiv},
-      primaryClass={quant-ph}
+      booktitle={International Conference on Theory and Applications of Satisfiability Testing}
 }
 ```
