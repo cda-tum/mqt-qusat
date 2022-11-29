@@ -1,7 +1,7 @@
 [![PyPI](https://img.shields.io/pypi/v/mqt.qusat?logo=pypi&style=flat-square)](https://pypi.org/project/mqt.qusat/)
 ![OS](https://img.shields.io/badge/os-linux%20%7C%20macos%20%7C%20windows-blue?style=flat-square)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)](https://opensource.org/licenses/MIT)
-[![CI](https://img.shields.io/github/workflow/status/cda-tum/qusat/CI?style=flat-square&logo=github&label=c%2B%2B)](https://github.com/cda-tum/qusat/actions/workflows/ci.yml)
+[![CI](https://img.shields.io/github/workflow/status/cda-tum/qusat/C++?style=flat-square&logo=github&label=c%2B%2B)](https://github.com/cda-tum/qusat/actions/workflows/ci.yml)
 [![Bindings](https://img.shields.io/github/workflow/status/cda-tum/qusat/Python%20Packaging?style=flat-square&logo=github&label=packaging)](https://github.com/cda-tum/qusat/actions/workflows/deploy.yml)
 [![codecov](https://img.shields.io/codecov/c/github/cda-tum/qusat?style=flat-square&logo=codecov)](https://codecov.io/gh/cda-tum/qusat)
 

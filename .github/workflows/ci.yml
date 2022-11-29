@@ -1,123 +1,69 @@
-name: CI
+name: C++
 
 on:
-  push:
-    branches: [main]
   pull_request:
-    branches: [main]
+  push:
+    branches:
+      - main
   workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
 
 defaults:
   run:
     shell: bash
 
 env:
-  BUILD_TYPE: Release
-  CMAKE_BUILD_PARALLEL_LEVEL: 2
-  Z3_GIT_TAG: z3-4.8.15
+  CMAKE_BUILD_PARALLEL_LEVEL: 3
+  Z3_VERSION: 4.11.2
 
 jobs:
-  ubuntu-ci:
-    runs-on: ubuntu-latest
-
+  cpp-tests:
+    name: Tests ${{ matrix.config.os }}
+    runs-on: ${{ matrix.config.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+          - { os: ubuntu-latest, test-dir: build/test, toolchain: "" }
+          - { os: macos-latest, test-dir: build/test, toolchain: "" }
+          - {
+              os: windows-latest,
+              test-dir: build\test\Release,
+              toolchain: "-T ClangCl",
+            }
     steps:
       - uses: actions/checkout@v3
         with:
           submodules: recursive
-
-      - uses: actions/setup-python@v4
-        name: Install Python
-        with:
-          python-version: "3.9"
-
       - name: Install Z3
-        run: python -m pip install z3-solver
-
+        uses: cda-tum/setup-z3@v1
+        with:
+          version: ${{ env.Z3_VERSION }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Configure CMake
-        run: |
-          export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/python/cp39-cp39/lib/python3.9/site-packages/z3/lib
-          export Z3_ROOT=/opt/python/cp39-cp39/lib/python3.9/site-packages/z3
-          export Z3_DIR=/opt/python/cp39-cp39/lib/python3.9/site-packages/z3
-          cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build" -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DBUILD_QUSAT_TESTS=ON -DBINDINGS=ON
-
+        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DBUILD_QUSAT_TESTS=ON ${{ matrix.config.toolchain }}
       - name: Build
-        run: |
-          cmake --build "${{github.workspace}}/build" --config $BUILD_TYPE --target qusat
-          cmake --build "${{github.workspace}}/build" --config $BUILD_TYPE --target qusat_test
-
+        run: cmake --build build --config Release
       - name: Test
-        working-directory: ${{github.workspace}}/build/test
-        run: ctest -C $BUILD_TYPE --output-on-failure
-
-      - name: Coverage
+        working-directory: ${{ matrix.config.test-dir }}
+        run: ctest -C Release --output-on-failure
+      - if: runner.os == 'Linux'
+        name: Coverage
         run: |
-          export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/python/cp39-cp39/lib/python3.9/site-packages/z3/lib
-          export Z3_ROOT=/opt/python/cp39-cp39/lib/python3.9/site-packages/z3
-          export Z3_DIR=/opt/python/cp39-cp39/lib/python3.9/site-packages/z3
-          cmake -S "${{github.workspace}}" -B "${{github.workspace}}/buildCov" -DCMAKE_BUILD_TYPE=Debug -DBUILD_QUSAT_TESTS=ON -DCOVERAGE=ON -DBINDINGS=ON
-          cmake --build "${{github.workspace}}/buildCov" --config Debug --target qusat_test
+          cmake -S . -B buildCov -DCMAKE_BUILD_TYPE=Debug -DBUILD_QUSAT_TESTS=ON -DCOVERAGE=ON
+          cmake --build buildCov --config Debug
           cd buildCov/test
-          ctest -C $BUILD_TYPE --output-on-failure
-      - name: Run gcov
-        run: |
-          find . -type f -name '*.gcno' -exec gcov -p  {} +
-      - name: Upload coverage to Codecov
+          ctest -C Debug --output-on-failure
+      - if: runner.os == 'Linux'
+        name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3.1.1
-
-  macOS-ci:
-    runs-on: macos-latest
-
-    steps:
-      - uses: actions/checkout@v3
         with:
-          submodules: recursive
-
-      - name: Installing Z3
-        run: brew install z3
-
-      - name: Configure CMake
-        run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build" -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DBUILD_QUSAT_TESTS=ON
-
-      - name: Build
-        run: |
-          cmake --build "${{github.workspace}}/build" --config $BUILD_TYPE --target qusat
-          cmake --build "${{github.workspace}}/build" --config $BUILD_TYPE --target qusat_test
-
-      - name: Test
-        working-directory: ${{github.workspace}}/build/test
-        run: ctest -C $BUILD_TYPE --output-on-failure
-
-  windows-ci:
-    runs-on: windows-latest
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          submodules: recursive
-
-      - uses: ilammy/msvc-dev-cmd@v1
-
-      - name: Cache Z3
-        id: cache-z3
-        uses: actions/cache@v3
-        with:
-          path: z3
-          key: ci-${{ runner.OS }}-${{ env.Z3_GIT_TAG }}-${{ hashFiles('**/deploy.yml') }}
-
-      - name: Building Z3
-        if: steps.cache-z3.outputs.cache-hit != 'true'
-        run: |
-          git clone --branch $Z3_GIT_TAG --depth 1 https://github.com/Z3Prover/z3.git
-          cmake -S z3 -B z3/build -DCMAKE_BUILD_TYPE=$BUILD_TYPE -G "Visual Studio 17 2022" -A x64 -DZ3_BUILD_LIBZ3_SHARED=FALSE -DZ3_BUILD_EXECUTABLE=False -DZ3_BUILD_TEST_EXECUTABLES=False
-          cmake --build z3/build --config $BUILD_TYPE
-
-      - name: Configure CMake
-        run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build" -DCMAKE_BUILD_TYPE=$BUILD_TYPE -T "ClangCl" -DZ3_ROOT=z3/build -DBUILD_QUSAT_TESTS=ON
-
-      - name: Build
-        run: cmake --build "${{github.workspace}}/build" --config $BUILD_TYPE
-
-      - name: Test
-        working-directory: ${{github.workspace}}/build/test
-        run: |
-          cd $BUILD_TYPE
-          ./qusat_test
+          fail_ci_if_error: true
+          flags: cpp
+          gcov: true
+          gcov_ignore: "extern/**/*"
+          token: ${{ secrets.CODECOV_TOKEN }}
