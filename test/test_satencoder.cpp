@@ -3,6 +3,10 @@
 #include "algorithms/RandomCliffordCircuit.hpp"
 
 #include <ctime>
+#ifdef _MSC_VER
+#define localtime_r(a, b) (localtime_s(b, a) == 0 ? b : NULL)
+#endif
+
 #include <filesystem>
 #include <gtest/gtest.h>
 #include <locale>
