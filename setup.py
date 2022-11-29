@@ -82,7 +82,8 @@ class CMakeBuild(build_ext):
         subprocess.check_call(
             ["cmake", "--build", ".", "--target", ext.name.split(".")[-1]] + build_args,
             cwd=self.build_temp,
-            )
+        )
+
 
 setup(
     ext_modules=[CMakeExtension("mqt.qusat.pyqusat")],

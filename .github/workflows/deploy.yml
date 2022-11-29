@@ -2,11 +2,11 @@ name: Deploy to PyPI
 
 on:
   release:
-    types: [ published ]
+    types: [published]
   push:
-    branches: [ main, master ]
+    branches: [main, master]
   pull_request:
-    branches: [ main, master ]
+    branches: [main, master]
   workflow_dispatch:
 
 env:
@@ -106,7 +106,7 @@ jobs:
       - uses: actions/setup-python@v4
         name: Install Python
         with:
-          python-version: '3.9'
+          python-version: "3.9"
       - name: Install Z3
         run: brew install z3
       - name: Build sdist
@@ -120,7 +120,14 @@ jobs:
           path: dist/*.tar.gz
 
   upload_pypi:
-    needs: [ build_manylinux_wheels, build_macos_wheels, build_macos_m1_wheels, build_windows_wheels, build_sdist ]
+    needs:
+      [
+        build_manylinux_wheels,
+        build_macos_wheels,
+        build_macos_m1_wheels,
+        build_windows_wheels,
+        build_sdist,
+      ]
     runs-on: ubuntu-latest
     if: github.event_name == 'release' && github.event.action == 'published'
     steps:
