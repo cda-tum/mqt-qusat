@@ -6,9 +6,7 @@
 #include <gtest/gtest.h>
 #include <locale>
 
-class SatEncoderTest : public testing::TestWithParam<std::string> {
-protected:
-};
+class SatEncoderTest : public testing::TestWithParam<std::string> {};
 
 TEST_F(SatEncoderTest, CheckEqualWhenEqualRandomCircuits) {
   std::random_device        rd;
@@ -87,8 +85,6 @@ std::vector<std::string> getAllCompBasisStates(std::size_t nrQubits) {
   }
   return appended;
 }
-
-#pragma clang diagnostic pop
 
 class SatEncoderBenchmarking : public testing::TestWithParam<std::string> {
 public:
