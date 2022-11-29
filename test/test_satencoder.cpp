@@ -2,6 +2,7 @@
 #include "SatEncoder.hpp"
 #include "algorithms/RandomCliffordCircuit.hpp"
 
+#include <ctime>
 #include <filesystem>
 #include <gtest/gtest.h>
 #include <locale>
@@ -106,9 +107,10 @@ TEST_F(SatEncoderBenchmarking,
       const std::size_t  maxNrOfQubits = 16;
       std::random_device rd;
       std::ostringstream oss;
-      auto               t  = std::time(nullptr);
-      auto               tm = *std::localtime(&t);
-      oss << std::put_time(&tm, "%d-%m-%Y");
+      auto               t = std::time(nullptr);
+      struct tm          now {};
+      localtime_r(&t, &now);
+      oss << std::put_time(&now, "%d-%m-%Y");
       auto filename = oss.str();
 
       std::ofstream outfile(benchmarkFilesPath + "QB-" + std::to_string(depth) +
@@ -151,9 +153,10 @@ TEST_F(SatEncoderBenchmarking,
       const std::size_t  stepsize = 5U;
       std::random_device rd;
       std::ostringstream oss;
-      auto               t  = std::time(nullptr);
-      auto               tm = *std::localtime(&t);
-      oss << std::put_time(&tm, "%d-%m-%Y");
+      auto               t = std::time(nullptr);
+      struct tm          now {};
+      localtime_r(&t, &now);
+      oss << std::put_time(&now, "%d-%m-%Y");
       auto filename = oss.str();
 
       std::ofstream outfile(benchmarkFilesPath + "CS-" +
@@ -196,9 +199,10 @@ TEST_F(SatEncoderBenchmarking,
       const std::size_t  stepsize = 1U;
       std::random_device rd;
       std::ostringstream oss;
-      auto               t  = std::time(nullptr);
-      auto               tm = *std::localtime(&t);
-      oss << std::put_time(&tm, "%d-%m-%Y");
+      auto               t = std::time(nullptr);
+      struct tm          now {};
+      localtime_r(&t, &now);
+      oss << std::put_time(&now, "%d-%m-%Y");
       auto filename = oss.str();
 
       std::ofstream outfile(benchmarkFilesPath + "G-" +
@@ -245,9 +249,10 @@ TEST_F(SatEncoderBenchmarking,
     std::ostringstream oss;
     std::mt19937       gen(rd());
     std::mt19937       gen2(rd());
-    auto               t  = std::time(nullptr);
-    auto               tm = *std::localtime(&t);
-    oss << std::put_time(&tm, "%d-%m-%Y");
+    auto               t = std::time(nullptr);
+    struct tm          now {};
+    localtime_r(&t, &now);
+    oss << std::put_time(&now, "%d-%m-%Y");
     auto timestamp = oss.str();
 
     std::ofstream outfile(benchmarkFilesPath + "EC-" + timestamp + ".json");
