@@ -1,12 +1,51 @@
 [build-system]
 requires = [
-    "setuptools>=45",
-    "setuptools-scm>=6.4",
-    "wheel>=0.37",
+    "setuptools>=61",
+    "setuptools_scm[toml]>=7",
     "ninja>=1.10; sys_platform != 'win32'",
-    "cmake>=3.14",
+    "cmake>=3.19",
 ]
 build-backend = "setuptools.build_meta"
+
+[project]
+name = "mqt.qusat"
+description= "MQT QuSAT - A Tool for Utilizing SAT in Quantum Computing"
+readme = "README.md"
+authors = [
+    { name = "Lucas Berent", email = "lucas.berent@tum.de" },
+    { name = "Lukas Burgholzer", email = "lukas.burgholzer@jku.at" },
+]
+keywords = ["MQT", "quantum computing", "design automation", "satisfiability"]
+license = { file = "LICENSE" }
+
+classifiers=[
+    "Development Status :: 5 - Production/Stable",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: C++",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: Microsoft :: Windows",
+    "Operating System :: MacOS",
+    "Operating System :: POSIX :: Linux",
+    "Intended Audience :: Science/Research",
+    "Natural Language :: English",
+    "Topic :: Scientific/Engineering :: Electronic Design Automation (EDA)",
+]
+requires-python = ">=3.7"
+dynamic = ["version"]
+
+[project.urls]
+Homepage = "https://github.com/cda-tum/qusat"
+"Bug Tracker" = "https://github.com/cda-tum/qusat/issues"
+Discussions = "https://github.com/cda-tum/qusat/discussions"
+Research = "https://www.cda.cit.tum.de/research/quantum"
+
+[tool.setuptools.packages.find]
+include = ["mqt.*"]
 
 [tool.setuptools_scm]
 
