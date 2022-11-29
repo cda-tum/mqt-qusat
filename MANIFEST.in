@@ -1,6 +1,4 @@
-prune docs
 prune test
-prune .idea
 
 graft extern/qfr
 prune **/.github
