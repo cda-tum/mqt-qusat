@@ -1,12 +1,51 @@
 [build-system]
 requires = [
-    "setuptools>=45",
-    "setuptools-scm>=6.4",
-    "wheel>=0.37",
+    "setuptools>=61",
+    "setuptools_scm[toml]>=7",
     "ninja>=1.10; sys_platform != 'win32'",
-    "cmake>=3.14",
+    "cmake>=3.19",
 ]
 build-backend = "setuptools.build_meta"
+
+[project]
+name = "mqt.qusat"
+description= "MQT QuSAT - A Tool for Utilizing SAT in Quantum Computing"
+readme = "README.md"
+authors = [
+    { name = "Lucas Berent", email = "lucas.berent@tum.de" },
+    { name = "Lukas Burgholzer", email = "lukas.burgholzer@jku.at" },
+]
+keywords = ["MQT", "quantum computing", "design automation", "satisfiability"]
+license = { file = "LICENSE" }
+
+classifiers=[
+    "Development Status :: 5 - Production/Stable",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: C++",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: Microsoft :: Windows",
+    "Operating System :: MacOS",
+    "Operating System :: POSIX :: Linux",
+    "Intended Audience :: Science/Research",
+    "Natural Language :: English",
+    "Topic :: Scientific/Engineering :: Electronic Design Automation (EDA)",
+]
+requires-python = ">=3.7"
+dynamic = ["version"]
+
+[project.urls]
+Homepage = "https://github.com/cda-tum/qusat"
+"Bug Tracker" = "https://github.com/cda-tum/qusat/issues"
+Discussions = "https://github.com/cda-tum/qusat/discussions"
+Research = "https://www.cda.cit.tum.de/research/quantum"
+
+[tool.setuptools.packages.find]
+include = ["mqt.*"]
 
 [tool.setuptools_scm]
 
@@ -14,18 +53,76 @@ build-backend = "setuptools.build_meta"
 build = "cp3*"
 archs = "auto64"
 skip = "*-musllinux*"
-test-skip = "*-macosx_arm64 *-musllinux* *aarch64"
+test-skip = "*-macosx_arm64"
 test-command = "python -c \"from mqt import qusat\""
 environment = { DEPLOY = "ON" }
 build-frontend = "build"
 build-verbosity = 3
 
 [tool.cibuildwheel.linux]
-before-all = "/opt/python/cp39-cp39/bin/python -m pip install z3-solver"
-environment = { LD_LIBRARY_PATH = "$LD_LIBRARY_PATH:/opt/python/cp39-cp39/lib/python3.9/site-packages/z3/lib", Z3_ROOT = "/opt/python/cp39-cp39/lib/python3.9/site-packages/z3", Z3_DIR = "/opt/python/cp39-cp39/lib/python3.9/site-packages/z3", DEPLOY = "ON" }
+environment = { Z3_ROOT="/opt/python/cp39-cp39/lib/python3.9/site-packages/z3", DEPLOY = "ON"}
 
 [tool.cibuildwheel.macos]
 archs = "x86_64"
 environment = { MACOSX_DEPLOYMENT_TARGET = "10.15", DEPLOY = "ON" }
 
 [tool.cibuildwheel.windows]
+before-build = "pip install delvewheel"
+repair-wheel-command = "delvewheel repair -v -w {dest_dir} {wheel}"
+
+[tool.pytest.ini_options]
+minversion = "7.0"
+testpaths = ["test/python"]
+addopts = ["-ra", "--strict-markers", "--strict-config", "--showlocals"]
+log_cli_level = "INFO"
+xfail_strict = true
+filterwarnings = [
+    "error",
+]
+[tool.coverage.run]
+source = ["mqt.qusat"]
+
+[tool.coverage.report]
+show_missing = true
+skip_empty = true
+precision = 1
+
+[tool.black]
+line-length = 120
+
+[tool.isort]
+profile = "black"
+src_paths = ["mqt/qusat", "test/python"]
+
+[tool.mypy]
+files = ["mqt/qusat", "test/python", "setup.py"]
+python_version = "3.7"
+strict = true
+show_error_codes = true
+enable_error_code = ["ignore-without-code", "redundant-expr", "truthy-bool"]
+warn_unreachable = true
+explicit_package_bases = true
+
+[tool.pylint]
+master.py-version = "3.7"
+master.jobs = "0"
+reports.output-format = "colorized"
+similarities.ignore-imports = "yes"
+messages_control.enable = [
+    "useless-suppression",
+]
+messages_control.disable = [
+    "invalid-name",
+    "line-too-long",
+    "missing-module-docstring",
+    "no-member",
+    "protected-access",
+    "too-few-public-methods",
+    "too-many-arguments",
+    "too-many-branches",
+    "too-many-locals",
+    "too-many-statements",
+    "ungrouped-imports",
+    "wrong-import-order",
+    "wrong-import-position",
+]
