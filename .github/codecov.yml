@@ -1,14 +1,32 @@
 ignore:
   - "extern/**/*"
-  - "test/*.cpp"
+  - "test/**/*"
+  - "mqt/**/*.cpp"
 
 coverage:
   range: 60..90
   precision: 1
   status:
-    project:
-      default:
+    project: off
+    patch: off
+
+flag_management:
+  default_rules:
+    statuses:
+      - type: project
+        target: auto
         threshold: 0.5%
-    patch:
-      default:
+      - type: patch
+        target: 90%
         threshold: 1%
+  individual_flags:
+    - name: cpp
+      paths:
+        - "include"
+        - "src"
+
+parsers:
+  gcov:
+    branch_detection:
+      conditional: no
+      loop: no
