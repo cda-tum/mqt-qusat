@@ -25,6 +25,17 @@ TEST_F(SatEncoderTest, CheckEqualWhenEqualRandomCircuits) {
   EXPECT_EQ(result, true);
 }
 
+TEST_F(SatEncoderTest, CheckErrorWhenEmpty) {
+  std::random_device        rd;
+  std::mt19937              gen(rd());
+  qc::RandomCliffordCircuit circOne(0, 0, 0);
+  qc::RandomCliffordCircuit circTwo(0, 0, 0);
+
+  SatEncoder satEncoder;
+  bool       result = satEncoder.testEqual(circOne, circTwo);
+  EXPECT_EQ(result, false);
+}
+
 TEST_F(SatEncoderTest, CheckEqualWhenNotEqualRandomCircuits) {
   std::random_device        rd;
   std::mt19937              gen(rd());
