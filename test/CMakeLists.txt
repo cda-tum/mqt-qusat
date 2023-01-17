@@ -1,17 +1,13 @@
-if (NOT TARGET gtest OR NOT TARGET gmock)
+if(NOT TARGET gtest OR NOT TARGET gmock)
   # Prevent overriding the parent project's compiler/linker settings on Windows
   set(gtest_force_shared_crt # cmake-lint: disable=C0103
-          ON
-          CACHE BOOL "" FORCE)
+      ON
+      CACHE BOOL "" FORCE)
   add_subdirectory("${PROJECT_SOURCE_DIR}/extern/qfr/extern/dd_package/extern/googletest"
-          "extern/qfr/extern/dd_package/extern/googletest" EXCLUDE_FROM_ALL)
+                   "extern/qfr/extern/dd_package/extern/googletest" EXCLUDE_FROM_ALL)
 
   set_target_properties(gtest gtest_main gmock gmock_main PROPERTIES FOLDER extern)
 
-endif ()
+endif()
 
-package_add_test(
-        ${PROJECT_NAME}_test
-        ${PROJECT_NAME}
-        test_satencoder.cpp
-)
+package_add_test(${PROJECT_NAME}_test ${PROJECT_NAME} test_satencoder.cpp)

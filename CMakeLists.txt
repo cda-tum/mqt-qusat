@@ -3,13 +3,13 @@ cmake_policy(SET CMP0069 NEW)
 set(CMAKE_POLICY_DEFAULT_CMP0069 NEW)
 
 project(
-        qusat
-        LANGUAGES CXX
-        DESCRIPTION "A Tool for Utilizing SAT in Quantum Computing")
+  qusat
+  LANGUAGES CXX
+  DESCRIPTION "A Tool for Utilizing SAT in Quantum Computing")
 
 # check whether the submodule ``modulename`` is correctly cloned in the ``/extern`` directory.
 macro(CHECK_SUBMODULE_PRESENT modulename)
-  if (NOT EXISTS "${PROJECT_SOURCE_DIR}/extern/${modulename}/CMakeLists.txt")
+  if(NOT EXISTS "${PROJECT_SOURCE_DIR}/extern/${modulename}/CMakeLists.txt")
     message(
       FATAL_ERROR
         "${modulename} submodule not cloned properly. \
