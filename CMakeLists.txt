@@ -1,45 +1,11 @@
-cmake_minimum_required(VERSION 3.19...3.25)
+cmake_minimum_required(VERSION 3.19)
+cmake_policy(SET CMP0069 NEW)
+set(CMAKE_POLICY_DEFAULT_CMP0069 NEW)
 
 project(
   qusat
   LANGUAGES CXX
   DESCRIPTION "A Tool for Utilizing SAT in Quantum Computing")
-
-# enable organization of targets into folders
-set_property(GLOBAL PROPERTY USE_FOLDERS ON)
-
-# configuration options
-option(DEPLOY "Configure for deployment")
-option(BINDINGS "Configure for building Python bindings")
-option(COVERAGE "Configure for coverage report generation")
-option(GENERATE_POSITION_INDEPENDENT_CODE "Generate position independent code")
-option(BUILD_QUSAT_TESTS "Also build tests for project")
-
-if(DEFINED ENV{DEPLOY})
-  set(DEPLOY
-      $ENV{DEPLOY}
-      CACHE BOOL "Use deployment configuration from environment" FORCE)
-  message(STATUS "Setting deployment configuration to '${DEPLOY}' from environment")
-endif()
-
-# set deployment specific options
-if(DEPLOY)
-  # set the macOS deployment target appropriately
-  set(CMAKE_OSX_DEPLOYMENT_TARGET
-      "10.15"
-      CACHE STRING "" FORCE)
-endif()
-
-# build type settings
-set(DEFAULT_BUILD_TYPE "Release")
-if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
-  message(STATUS "Setting build type to '${DEFAULT_BUILD_TYPE}' as none was specified.")
-  set(CMAKE_BUILD_TYPE
-      "${default_build_type}"
-      CACHE STRING "Choose the type of build." FORCE)
-  set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release" "MinSizeRel"
-                                               "RelWithDebInfo")
-endif()
 
 # check whether the submodule ``modulename`` is correctly cloned in the ``/extern`` directory.
 macro(CHECK_SUBMODULE_PRESENT modulename)
@@ -64,6 +30,7 @@ find_package(Z3 REQUIRED)
 add_subdirectory(src)
 
 # add test code
+option(BUILD_QUSAT_TESTS "Also build tests for QUSAT project")
 if(BUILD_QUSAT_TESTS)
   enable_testing()
   include(GoogleTest)
@@ -71,6 +38,7 @@ if(BUILD_QUSAT_TESTS)
 endif()
 
 # add Python binding code
+option(BINDINGS "Configure for building Python bindings")
 if(BINDINGS)
   add_subdirectory(mqt/qusat)
 endif()

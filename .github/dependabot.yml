@@ -3,11 +3,9 @@ updates:
   - package-ecosystem: "gitsubmodule"
     directory: "/"
     schedule:
-      interval: "weekly"
+      interval: "monthly"
       day: "friday"
       time: "06:00"
-    assignees:
-      - "burgholzer"
 
   - package-ecosystem: "github-actions"
     directory: "/"
@@ -15,8 +13,6 @@ updates:
       interval: "weekly"
       day: "friday"
       time: "06:00"
-    assignees:
-      - "burgholzer"
 
   - package-ecosystem: "pip"
     directory: "/"
@@ -24,5 +20,3 @@ updates:
       interval: "weekly"
       day: "friday"
       time: "06:00"
-    assignees:
-      - "burgholzer"
