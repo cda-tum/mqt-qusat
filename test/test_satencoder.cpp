@@ -27,13 +27,11 @@ TEST_F(SatEncoderTest, CheckEqualWhenEqualRandomCircuits) {
 
 TEST_F(SatEncoderTest, CheckErrorWhenEmpty) {
   std::random_device        rd;
-  qc::RandomCliffordCircuit circOne(1, 0, 0);
-  circOne.erase(circOne.begin(), circOne.end());
-
-  qc::RandomCliffordCircuit circTwo(1, 0, 0);
-  circTwo.erase(circTwo.begin(), circTwo.end());
-  SatEncoder satEncoder;
-  bool       result = satEncoder.testEqual(circOne, circTwo);
+  std::mt19937              gen(rd());
+  auto                      ckt = qc::QuantumComputation(1);
+  qc::RandomCliffordCircuit circOne(2, 1, gen());
+  SatEncoder                encoder{};
+  const auto                result = encoder.testEqual(ckt, circOne);
   EXPECT_EQ(result, false);
 }
 

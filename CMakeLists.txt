@@ -30,7 +30,7 @@ find_package(Z3 REQUIRED)
 add_subdirectory(src)
 
 # add test code
-option(BUILD_QCEC_TESTS "Also build tests for QMAP project")
+option(BUILD_QUSAT_TESTS "Also build tests for QUSAT project")
 if(BUILD_QUSAT_TESTS)
   enable_testing()
   include(GoogleTest)
