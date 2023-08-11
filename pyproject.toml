@@ -21,7 +21,6 @@ license = { file = "LICENSE" }
 classifiers=[
     "Development Status :: 5 - Production/Stable",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.7",
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
@@ -36,7 +35,7 @@ classifiers=[
     "Natural Language :: English",
     "Topic :: Scientific/Engineering :: Electronic Design Automation (EDA)",
 ]
-requires-python = ">=3.7"
+requires-python = ">=3.8"
 dynamic = ["version"]
 
 [project.urls]
@@ -97,7 +96,7 @@ src_paths = ["mqt/qusat", "test/python"]
 
 [tool.mypy]
 files = ["mqt/qusat", "test/python", "setup.py"]
-python_version = "3.7"
+python_version = "3.8"
 strict = true
 show_error_codes = true
 enable_error_code = ["ignore-without-code", "redundant-expr", "truthy-bool"]
@@ -105,7 +104,7 @@ warn_unreachable = true
 explicit_package_bases = true
 
 [tool.pylint]
-master.py-version = "3.7"
+master.py-version = "3.8"
 master.jobs = "0"
 reports.output-format = "colorized"
 similarities.ignore-imports = "yes"
