@@ -19,7 +19,7 @@ The project is in active development and can currently be used to
 - Encode Clifford circuits in SAT
 - Check the equivalence of Clifford circuits using SAT
 
-If you have any questions, feel free to contact us via [quantum.cda@xcit.tum.de](mailto:quantum.cda@xcit.tum.de) or by creating an issue on [GitHub](https://github.com/cda-tum/qusat/issues).
+If you have any questions, feel free to contact us via [quantum.cda@xcit.tum.de](mailto:quantum.cda@xcit.tum.de) or by creating an issue on [GitHub](https://github.com/cda-tum/mqt-qusat/issues).
 
 ## Towards a Satisfiability Encoding for Quantum Circuits
 

@@ -13,7 +13,7 @@ description= "MQT QuSAT - A Tool for Utilizing SAT in Quantum Computing"
 readme = "README.md"
 authors = [
     { name = "Lucas Berent", email = "lucas.berent@tum.de" },
-    { name = "Lukas Burgholzer", email = "lukas.burgholzer@jku.at" },
+    { name = "Lukas Burgholzer", email = "lukas.burgholzer@tum.de" },
 ]
 keywords = ["MQT", "quantum computing", "design automation", "satisfiability"]
 license = { file = "LICENSE" }
@@ -39,9 +39,9 @@ requires-python = ">=3.8"
 dynamic = ["version"]
 
 [project.urls]
-Homepage = "https://github.com/cda-tum/qusat"
-"Bug Tracker" = "https://github.com/cda-tum/qusat/issues"
-Discussions = "https://github.com/cda-tum/qusat/discussions"
+Homepage = "https://github.com/cda-tum/mqt-qusat"
+"Bug Tracker" = "https://github.com/cda-tum/mqt-qusat/issues"
+Discussions = "https://github.com/cda-tum/mqt-qusat/discussions"
 Research = "https://www.cda.cit.tum.de/research/quantum"
 
 [tool.setuptools.packages.find]
