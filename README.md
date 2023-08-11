@@ -12,7 +12,7 @@ the [Technical University of Munich](https://www.tum.de/) based on methods propo
 
 - [[1]](https://arxiv.org/abs/2203.00698) L. Berent, L. Burgholzer, and R. Wille. Towards a Satisfiability Encoding for Quantum Circuits. 2022.
 
-QuSAT is part of the Munich Quantum Toolkit (MQT) and builds upon [our quantum functionality representation (QFR)](https://github.com/cda-tum/qfr).
+QuSAT is part of the Munich Quantum Toolkit (MQT) and builds upon [MQT Core](https://github.com/cda-tum/mqt-core).
 
 The project is in active development and can currently be used to
 
