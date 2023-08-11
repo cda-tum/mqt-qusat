@@ -6,7 +6,7 @@
 
 #include "SatEncoder.hpp"
 #include "pybind11/pybind11.h"
-#include "qiskit/QuantumCircuit.hpp"
+#include "python/qiskit/QuantumCircuit.hpp"
 
 #include <pybind11/stl.h>
 
