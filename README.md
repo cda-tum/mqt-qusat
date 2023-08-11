@@ -36,7 +36,7 @@ The experimental data used in the paper is available in `/results` directory.
 ## System Requirements
 
 Building (and running) is continuously tested under Linux, MacOS, and Windows using the [latest available system versions for GitHub Actions](https://github.com/actions/virtual-environments). However, the implementation should be compatible
-with any current C++ compiler supporting C++17 and a minimum CMake version of 3.14.
+with any current C++ compiler supporting C++17 and a minimum CMake version of 3.19.
 
 The SMT Solver [Z3 >= 4.8.3](https://github.com/Z3Prover/z3) has to be installed and the dynamic linker has to be able to find the library. This can be accomplished in a multitude of ways:
 
