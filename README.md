@@ -1,8 +1,8 @@
 [![PyPI](https://img.shields.io/pypi/v/mqt.qusat?logo=pypi&style=flat-square)](https://pypi.org/project/mqt.qusat/)
 ![OS](https://img.shields.io/badge/os-linux%20%7C%20macos%20%7C%20windows-blue?style=flat-square)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)](https://opensource.org/licenses/MIT)
-[![CI](https://img.shields.io/github/actions/workflow/status/cda-tum/mqt-qusat/ci.yml?branch=main&style=flat-square&logo=github&label=c%2B%2B)](https://github.com/cda-tum/mqt-qusat/actions/workflows/ci.yml)
-[![Bindings](https://img.shields.io/github/actions/workflow/status/cda-tum/mqt-qusat/deploy.yml?branch=main&style=flat-square&logo=github&label=packaging)](https://github.com/cda-tum/mqt-qusat/actions/workflows/deploy.yml)
+[![CI](https://img.shields.io/github/actions/workflow/status/cda-tum/mqt-qusat/ci.yml?branch=main&style=flat-square&logo=github&label=ci)](https://github.com/cda-tum/mqt-qusat/actions/workflows/ci.yml)
+[![CD](https://img.shields.io/github/actions/workflow/status/cda-tum/mqt-qusat/cd.yml?style=flat-square&logo=github&label=cd)](https://github.com/cda-tum/mqt-qusat/actions/workflows/cd.yml)
 [![codecov](https://img.shields.io/codecov/c/github/cda-tum/mqt-qusat?style=flat-square&logo=codecov)](https://codecov.io/gh/cda-tum/mqt-qusat)
 
 > [!NOTE]
@@ -10,14 +10,13 @@
 
 # MQT QuSAT - A Tool for Utilizing SAT in Quantum Computing
 
-A tool for utilizing satisfiablity testing (SAT) techniques in quantum computing developed by the Chair for Design Automation at
-the [Technical University of Munich](https://www.tum.de/) based on methods proposed in:
+A tool for utilizing satisfiablity testing (SAT) techniques in quantum computing developed as part of the [_Munich Quantum Toolkit_](https://mqt.readthedocs.io) (_MQT_) by the [Chair for Design Automation](https://www.cda.cit.tum.de/) at the [Technical University of Munich](https://www.tum.de/) based on methods proposed in:
 
 - [[1]](https://arxiv.org/abs/2203.00698) L. Berent, L. Burgholzer, and R. Wille. Towards a Satisfiability Encoding for Quantum Circuits. 2022.
 
-QuSAT is part of the Munich Quantum Toolkit (MQT) and builds upon [MQT Core](https://github.com/cda-tum/mqt-core).
+QuSAT builds upon [MQT Core](https://github.com/cda-tum/mqt-core), which forms the backbone of the MQT.
 
-The project is in active development and can currently be used to
+The project can be used to
 
 - Encode Clifford circuits in SAT
 - Check the equivalence of Clifford circuits using SAT
