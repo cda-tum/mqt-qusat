@@ -15,34 +15,6 @@
   echo $(python -m pip cache dir)
   echo $(python -m pip cache list)
 
-macos_arm64_test_task:
-  name: 🐍 Test / 🍎 arm64
-  alias: macos_arm64_test
-  clone_script: *clone
-  macos_instance:
-    image: ghcr.io/cirruslabs/macos-monterey-xcode:latest
-  ccache_cache:
-    folder: .ccache
-    populate_script:
-      - mkdir -p .ccache
-    fingerprint_key: ccache-macosx_arm64
-  pip_cache:
-    folder: /Users/admin/Library/Caches/pip
-  prepare_env_script: |
-    brew install python@3.10 ccache pipx ninja nox z3
-    ln -s $(which python3.10) python
-    export PATH=/opt/homebrew/opt/python@3.10/libexec/bin:$PATH
-    export PATH=/opt/homebrew/opt/ccache/libexec:$PATH
-    export PATH=/opt/homebrew/opt/pipx/libexec:$PATH
-    export PATH=/opt/homebrew/opt/ninja/libexec:$PATH
-    export PATH=/opt/homebrew/opt/nox/libexec:$PATH
-    echo "PATH=$PATH" >> $CIRRUS_ENV
-    echo "CCACHE_DIR=$PWD/.ccache" >> $CIRRUS_ENV
-    echo "Z3_ROOT=/opt/homebrew/opt/z3" >> $CIRRUS_ENV
-  run_nox_script:
-    - nox -s tests-3.10 --verbose
-  statistics_script: *statistics
-
 build_and_store_wheels: &BUILD_AND_STORE_WHEELS
   install_cibuildwheel_script:
     - python -m pip install cibuildwheel~=2.15.0
