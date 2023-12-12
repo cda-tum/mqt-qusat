@@ -158,7 +158,7 @@ SatEncoder::preprocessCircuit(const qc::DAG&                  dag,
               currState.applyH(target);
             } else if (gate->getType() == qc::OpType::S) {
               currState.applyS(target);
-            } else if (gate->getType() == qc::OpType::Sdag) {
+            } else if (gate->getType() == qc::OpType::Sdg) {
               currState.applyS(target); // Sdag == SSS
               currState.applyS(target);
               currState.applyS(target);
@@ -411,7 +411,7 @@ bool SatEncoder::isClifford(const qc::QuantumComputation& qc) {
   for (const auto& op : qc) {
     opType = op->getType();
     if (opType != qc::OpType::H && opType != qc::OpType::S &&
-        opType != qc::OpType::Sdag && opType != qc::OpType::X &&
+        opType != qc::OpType::Sdg && opType != qc::OpType::X &&
         opType != qc::OpType::Z && opType != qc::OpType::Y &&
         opType != qc::OpType::I) {
       return false;
