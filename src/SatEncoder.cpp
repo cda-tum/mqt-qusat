@@ -3,36 +3,41 @@
 bool SatEncoder::testEqual(qc::QuantumComputation&         circuitOne,
                            qc::QuantumComputation&         circuitTwo,
                            const std::vector<std::string>& inputs) {
-  std::cout << "Entering testEqual\n";
-  if (!isClifford(circuitOne) || !isClifford(circuitTwo)) {
-    std::cerr << "Circuits are not Clifford circuits" << std::endl;
-    return false;
-  }
-  if (circuitOne.empty() || circuitTwo.empty()) {
-    std::cerr << "Both circuits must be non-empy" << std::endl;
-    return false;
-  }
-  std::cout << "Circuits are Clifford circuits and non-empty\n";
-  stats.nrOfDiffInputStates = inputs.size();
-  stats.nrOfQubits          = circuitOne.getNqubits();
-  qc::DAG dagOne            = qc::CircuitOptimizer::constructDAG(circuitOne);
-  qc::DAG dagTwo            = qc::CircuitOptimizer::constructDAG(circuitTwo);
-  std::cout << "DAGs constructed\n";
-  SatEncoder::CircuitRepresentation circOneRep =
-      preprocessCircuit(dagOne, inputs);
-  std::cout << "First circuit preprocessed\n";
-  SatEncoder::CircuitRepresentation circTwoRep =
-      preprocessCircuit(dagTwo, inputs);
-  std::cout << "Second circuit preprocessed\n";
-  z3::context ctx{};
-  z3::solver  solver(ctx);
-  constructMiterInstance(circOneRep, circTwoRep, solver);
-  std::cout << "Miter instance constructed\n";
+  try {
+    std::cout << "Entering testEqual\n";
+    if (!isClifford(circuitOne) || !isClifford(circuitTwo)) {
+      std::cerr << "Circuits are not Clifford circuits" << std::endl;
+      return false;
+    }
+    if (circuitOne.empty() || circuitTwo.empty()) {
+      std::cerr << "Both circuits must be non-empy" << std::endl;
+      return false;
+    }
+    std::cout << "Circuits are Clifford circuits and non-empty\n";
+    stats.nrOfDiffInputStates = inputs.size();
+    stats.nrOfQubits          = circuitOne.getNqubits();
+    qc::DAG dagOne            = qc::CircuitOptimizer::constructDAG(circuitOne);
+    qc::DAG dagTwo            = qc::CircuitOptimizer::constructDAG(circuitTwo);
+    std::cout << "DAGs constructed\n";
+    SatEncoder::CircuitRepresentation circOneRep =
+        preprocessCircuit(dagOne, inputs);
+    std::cout << "First circuit preprocessed\n";
+    SatEncoder::CircuitRepresentation circTwoRep =
+        preprocessCircuit(dagTwo, inputs);
+    std::cout << "Second circuit preprocessed\n";
+    z3::context ctx{};
+    z3::solver  solver(ctx);
+    constructMiterInstance(circOneRep, circTwoRep, solver);
+    std::cout << "Miter instance constructed\n";
 
-  bool equal  = !isSatisfiable(solver);
-  stats.equal = equal;
+    bool equal  = !isSatisfiable(solver);
+    stats.equal = equal;
 
-  return equal;
+    return equal;
+  } catch (std::exception const& e) {
+    std::cerr << "Exception: " << e.what() << std::endl;
+    throw;
+  }
 }
 
 bool SatEncoder::testEqual(qc::QuantumComputation& circuitOne,
