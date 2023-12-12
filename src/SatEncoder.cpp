@@ -200,8 +200,8 @@ SatEncoder::preprocessCircuit(const qc::DAG&                  dag,
         id = generators.at(currLevelGen);
       }
       representation.idGeneratorMap.emplace(id, currLevelGen);
-      representation.generatorMappings.at(levelCnt).insert(
-          std::make_pair(state.prevGenId, id));
+      representation.generatorMappings.at(levelCnt).emplace(state.prevGenId,
+                                                            id);
       state.prevGenId = id;
     }
   }
