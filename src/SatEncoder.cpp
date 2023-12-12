@@ -102,10 +102,10 @@ SatEncoder::preprocessCircuit(const qc::DAG&                  dag,
   SatEncoder::CircuitRepresentation representation;
   unsigned long                     nrOfQubits = dag.size();
 
-  std::cerr << "Initializing state\n"
+  std::cerr << "Initializing state\n";
 
-      // compute nr of levels of ckt = #generators needed per input state
-      std::size_t tmp;
+  // compute nr of levels of ckt = #generators needed per input state
+  std::size_t tmp;
   for (std::size_t i = 0U; i < inputSize; i++) {
     tmp = dag.at(i).size();
     if (tmp > nrOfLevels) {
