@@ -521,20 +521,3 @@ void SatEncoder::QState::applyS(unsigned long target) {
     z[i][target] = z[i][target] ^ x[i][target];
   }
 }
-
-void SatEncoder::QState::printStateTableau() {
-  std::cout << std::endl;
-  for (std::size_t i = 0U; i < n; i++) {
-    for (std::size_t j = 0U; j < n; j++) {
-      std::cout << x.at(i).at(j);
-    }
-    std::cout << "|";
-    for (std::size_t j = 0U; j < n; j++) {
-      std::cout << z.at(i).at(j);
-    }
-    std::cout << "|";
-    std::cout << r.at(i);
-    std::cout << std::endl;
-  }
-  std::cout << std::endl;
-}
