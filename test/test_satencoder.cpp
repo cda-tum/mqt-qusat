@@ -54,7 +54,8 @@ TEST_F(SatEncoderTest, CheckEqualWhenNotEqualRandomCircuits) {
   std::cout << "Modified circuit:\n" << circTwo << std::endl;
 
   SatEncoder satEncoder;
-  bool       result = satEncoder.testEqual(circOne, circTwo);
+  std::cout << "Constructed SAT encoder" << std::endl;
+  bool result = satEncoder.testEqual(circOne, circTwo);
   EXPECT_EQ(result, false);
 }
 

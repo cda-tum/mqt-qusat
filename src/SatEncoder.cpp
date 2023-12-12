@@ -3,6 +3,7 @@
 bool SatEncoder::testEqual(qc::QuantumComputation&         circuitOne,
                            qc::QuantumComputation&         circuitTwo,
                            const std::vector<std::string>& inputs) {
+  std::cout << "Entering testEqual\n";
   if (!isClifford(circuitOne) || !isClifford(circuitTwo)) {
     std::cerr << "Circuits are not Clifford circuits" << std::endl;
     return false;
@@ -11,7 +12,7 @@ bool SatEncoder::testEqual(qc::QuantumComputation&         circuitOne,
     std::cerr << "Both circuits must be non-empy" << std::endl;
     return false;
   }
-  std::cout << "Entering testEqual\n";
+  std::cout << "Circuits are Clifford circuits and non-empty\n";
   stats.nrOfDiffInputStates = inputs.size();
   stats.nrOfQubits          = circuitOne.getNqubits();
   qc::DAG dagOne            = qc::CircuitOptimizer::constructDAG(circuitOne);
