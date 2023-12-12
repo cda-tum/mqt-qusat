@@ -2,6 +2,7 @@
 # This file is part of the JKQ QMAP library which is released under the MIT license.
 # See file README.md or go to https://github.com/lucasberent/qsatencoder for more information.
 #
+from __future__ import annotations
 
 import csv
 import math
@@ -15,7 +16,7 @@ import scipy.optimize as opt
 from mpl_toolkits.axes_grid1.inset_locator import InsetPosition, mark_inset
 
 
-def plotEC():
+def plotEC() -> None:
     filenameEC = ""
 
     fig, ax = plt.subplots()
@@ -28,28 +29,24 @@ def plotEC():
     rows = []
 
     for row in range(eqIdx):
-        rows.append(
-            [
-                df[row]["nrOfQubits"],
-                df[row]["numGates"],
-                (df[row]["preprocTime"] + df[row]["satConstructionTime"]) / 1000,
-                (df[row]["solvingTime"]) / 1000,
-                int(df[row]["z3map"]["sat conflicts"]) if "sat conflicts" in df[row]["z3map"] else int(0),
-            ]
-        )
+        rows.append([
+            df[row]["nrOfQubits"],
+            df[row]["numGates"],
+            (df[row]["preprocTime"] + df[row]["satConstructionTime"]) / 1000,
+            (df[row]["solvingTime"]) / 1000,
+            int(df[row]["z3map"]["sat conflicts"]) if "sat conflicts" in df[row]["z3map"] else 0,
+        ])
 
     ueqIdx = len(df) - eqIdx
     rows2 = []
     for row in range(ueqIdx, len(df), 1):
-        rows2.append(
-            [
-                df[row]["nrOfQubits"],
-                df[row]["numGates"],
-                (df[row]["preprocTime"] + df[row]["satConstructionTime"]) / 1000,
-                (df[row]["solvingTime"]) / 1000,
-                int(df[row]["z3map"]["sat conflicts"]) if "sat conflicts" in df[row]["z3map"] else int(0),
-            ]
-        )
+        rows2.append([
+            df[row]["nrOfQubits"],
+            df[row]["numGates"],
+            (df[row]["preprocTime"] + df[row]["satConstructionTime"]) / 1000,
+            (df[row]["solvingTime"]) / 1000,
+            int(df[row]["z3map"]["sat conflicts"]) if "sat conflicts" in df[row]["z3map"] else 0,
+        ])
     with Path("", "w").open() as outfile:
         writer = csv.writer(outfile)
         for i in range(len(rows)):
@@ -77,7 +74,7 @@ def ConstFun(x, a, b):
 
 
 # preprocessing+satconstruction time in nr of qubits
-def plotScaling():
+def plotScaling() -> None:
     filenameQB = ""
     filenameQB1 = ""
     filenameQB2 = ""
@@ -139,42 +136,20 @@ def plotScaling():
             time2.append(dfQB2[row + i]["preprocTime"] + dfQB2[row + i]["satConstructionTime"])
             time3.append(dfQB3[row + i]["preprocTime"] + dfQB3[row + i]["satConstructionTime"])
 
-            twocls = (
-                dfQB[row + i]["z3map"]["sat mk clause 2ary"] if "sat mk clause 2ary" in dfQB[row + i]["z3map"] else 0
-            )
-            twocls1 = (
-                dfQB1[row + i]["z3map"]["sat mk clause 2ary"] if "sat mk clause 2ary" in dfQB1[row + i]["z3map"] else 0
-            )
-            twocls2 = (
-                dfQB2[row + i]["z3map"]["sat mk clause 2ary"] if "sat mk clause 2ary" in dfQB2[row + i]["z3map"] else 0
-            )
-            twocls3 = (
-                dfQB3[row + i]["z3map"]["sat mk clause 2ary"] if "sat mk clause 2ary" in dfQB3[row + i]["z3map"] else 0
-            )
+            twocls = dfQB[row + i]["z3map"].get("sat mk clause 2ary", 0)
+            twocls1 = dfQB1[row + i]["z3map"].get("sat mk clause 2ary", 0)
+            twocls2 = dfQB2[row + i]["z3map"].get("sat mk clause 2ary", 0)
+            twocls3 = dfQB3[row + i]["z3map"].get("sat mk clause 2ary", 0)
 
-            threecls = (
-                dfQB[row + i]["z3map"]["sat mk clause 3ary"] if "sat mk clause 3ary" in dfQB[row + i]["z3map"] else 0
-            )
-            threecls1 = (
-                dfQB1[row + i]["z3map"]["sat mk clause 3ary"] if "sat mk clause 3ary" in dfQB1[row + i]["z3map"] else 0
-            )
-            threecls2 = (
-                dfQB2[row + i]["z3map"]["sat mk clause 3ary"] if "sat mk clause 3ary" in dfQB2[row + i]["z3map"] else 0
-            )
-            threecls3 = (
-                dfQB3[row + i]["z3map"]["sat mk clause 3ary"] if "sat mk clause 3ary" in dfQB3[row + i]["z3map"] else 0
-            )
+            threecls = dfQB[row + i]["z3map"].get("sat mk clause 3ary", 0)
+            threecls1 = dfQB1[row + i]["z3map"].get("sat mk clause 3ary", 0)
+            threecls2 = dfQB2[row + i]["z3map"].get("sat mk clause 3ary", 0)
+            threecls3 = dfQB3[row + i]["z3map"].get("sat mk clause 3ary", 0)
 
-            ncls = dfQB[row + i]["z3map"]["sat mk clause nary"] if "sat mk clause nary" in dfQB[row + i]["z3map"] else 0
-            ncls1 = (
-                dfQB1[row + i]["z3map"]["sat mk clause nary"] if "sat mk clause nary" in dfQB1[row + i]["z3map"] else 0
-            )
-            ncls2 = (
-                dfQB2[row + i]["z3map"]["sat mk clause nary"] if "sat mk clause nary" in dfQB2[row + i]["z3map"] else 0
-            )
-            ncls3 = (
-                dfQB3[row + i]["z3map"]["sat mk clause nary"] if "sat mk clause nary" in dfQB3[row + i]["z3map"] else 0
-            )
+            ncls = dfQB[row + i]["z3map"].get("sat mk clause nary", 0)
+            ncls1 = dfQB1[row + i]["z3map"].get("sat mk clause nary", 0)
+            ncls2 = dfQB2[row + i]["z3map"].get("sat mk clause nary", 0)
+            ncls3 = dfQB3[row + i]["z3map"].get("sat mk clause nary", 0)
 
             clauses.append(twocls + threecls + ncls)
             clauses1.append(twocls1 + threecls1 + ncls1)
@@ -206,42 +181,20 @@ def plotScaling():
             time2.append(dfCS2[row + i]["preprocTime"] + dfCS2[row + i]["satConstructionTime"])
             time3.append(dfCS3[row + i]["preprocTime"] + dfCS3[row + i]["satConstructionTime"])
 
-            twocls = (
-                dfCS[row + i]["z3map"]["sat mk clause 2ary"] if "sat mk clause 2ary" in dfCS[row + i]["z3map"] else 0
-            )
-            twocls1 = (
-                dfCS1[row + i]["z3map"]["sat mk clause 2ary"] if "sat mk clause 2ary" in dfCS1[row + i]["z3map"] else 0
-            )
-            twocls2 = (
-                dfCS2[row + i]["z3map"]["sat mk clause 2ary"] if "sat mk clause 2ary" in dfCS2[row + i]["z3map"] else 0
-            )
-            twocls3 = (
-                dfCS3[row + i]["z3map"]["sat mk clause 2ary"] if "sat mk clause 2ary" in dfCS3[row + i]["z3map"] else 0
-            )
+            twocls = dfCS[row + i]["z3map"].get("sat mk clause 2ary", 0)
+            twocls1 = dfCS1[row + i]["z3map"].get("sat mk clause 2ary", 0)
+            twocls2 = dfCS2[row + i]["z3map"].get("sat mk clause 2ary", 0)
+            twocls3 = dfCS3[row + i]["z3map"].get("sat mk clause 2ary", 0)
 
-            threecls = (
-                dfCS[row + i]["z3map"]["sat mk clause 3ary"] if "sat mk clause 3ary" in dfCS[row + i]["z3map"] else 0
-            )
-            threecls1 = (
-                dfCS1[row + i]["z3map"]["sat mk clause 3ary"] if "sat mk clause 3ary" in dfCS1[row + i]["z3map"] else 0
-            )
-            threecls2 = (
-                dfCS2[row + i]["z3map"]["sat mk clause 3ary"] if "sat mk clause 3ary" in dfCS2[row + i]["z3map"] else 0
-            )
-            threecls3 = (
-                dfCS3[row + i]["z3map"]["sat mk clause 3ary"] if "sat mk clause 3ary" in dfCS3[row + i]["z3map"] else 0
-            )
+            threecls = dfCS[row + i]["z3map"].get("sat mk clause 3ary", 0)
+            threecls1 = dfCS1[row + i]["z3map"].get("sat mk clause 3ary", 0)
+            threecls2 = dfCS2[row + i]["z3map"].get("sat mk clause 3ary", 0)
+            threecls3 = dfCS3[row + i]["z3map"].get("sat mk clause 3ary", 0)
 
-            ncls = dfCS[row + i]["z3map"]["sat mk clause nary"] if "sat mk clause nary" in dfCS[row + i]["z3map"] else 0
-            ncls1 = (
-                dfCS1[row + i]["z3map"]["sat mk clause nary"] if "sat mk clause nary" in dfCS1[row + i]["z3map"] else 0
-            )
-            ncls2 = (
-                dfCS2[row + i]["z3map"]["sat mk clause nary"] if "sat mk clause nary" in dfCS2[row + i]["z3map"] else 0
-            )
-            ncls3 = (
-                dfCS3[row + i]["z3map"]["sat mk clause nary"] if "sat mk clause nary" in dfCS3[row + i]["z3map"] else 0
-            )
+            ncls = dfCS[row + i]["z3map"].get("sat mk clause nary", 0)
+            ncls1 = dfCS1[row + i]["z3map"].get("sat mk clause nary", 0)
+            ncls2 = dfCS2[row + i]["z3map"].get("sat mk clause nary", 0)
+            ncls3 = dfCS3[row + i]["z3map"].get("sat mk clause nary", 0)
 
             clauses.append(twocls + threecls + ncls)
             clauses1.append(twocls1 + threecls1 + ncls1)
@@ -369,7 +322,7 @@ def constant4Fun(x, y):
 
 
 # preprocessing+satconstruction time in nr of qubits
-def plotGenerators():
+def plotGenerators() -> None:
     filename = ""
     filename1 = ""
     filename2 = ""
@@ -437,7 +390,7 @@ def plotGenerators():
     ip = InsetPosition(ax, [0.5, 0.2, 0.3, 0.3])
     ax2.set_axes_locator(ip)
     mark_inset(ax, ax2, loc1=2, loc2=4, fc="none", ec="0.5")
-    expData = list(range(0, 50))
+    expData = list(range(50))
     ax.plot(
         expData,
         np.power(2, expData),
