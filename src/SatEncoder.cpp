@@ -102,14 +102,18 @@ SatEncoder::preprocessCircuit(const qc::DAG&                  dag,
   SatEncoder::CircuitRepresentation representation;
   unsigned long                     nrOfQubits = dag.size();
 
-  // compute nr of levels of ckt = #generators needed per input state
-  std::size_t tmp;
+  std::cerr << "Initializing state\n"
+
+      // compute nr of levels of ckt = #generators needed per input state
+      std::size_t tmp;
   for (std::size_t i = 0U; i < inputSize; i++) {
     tmp = dag.at(i).size();
     if (tmp > nrOfLevels) {
       nrOfLevels = tmp;
     }
   }
+
+  std::cerr << "Computed nr of levels: " << nrOfLevels << "\n";
 
   stats.circuitDepth =
       nrOfLevels > stats.circuitDepth ? nrOfLevels : stats.circuitDepth;
@@ -123,6 +127,8 @@ SatEncoder::preprocessCircuit(const qc::DAG&                  dag,
   } else {
     states.push_back(initializeState(nrOfQubits, {}));
   }
+
+  std::cerr << "Initialized states\n";
 
   // store generators of input state
   for (auto& state : states) {
@@ -138,13 +144,17 @@ SatEncoder::preprocessCircuit(const qc::DAG&                  dag,
     state.prevGenId = id;
   }
 
+  std::cerr << "Stored generators of input state\n";
+
   if (nrOfInputGenerators == 0) { // only in first pass
     nrOfInputGenerators = uniqueGenCnt;
   }
 
   for (std::size_t levelCnt = 0; levelCnt < nrOfLevels; levelCnt++) {
+    std::cerr << "Processing level " << levelCnt << "\n";
     for (std::size_t qubitCnt = 0U; qubitCnt < inputSize;
          qubitCnt++) { // operation of current level for each qubit
+      std::cerr << "Processing qubit " << qubitCnt << "\n";
       nrOfOpsOnQubit = dag.at(qubitCnt).size();
 
       if (levelCnt < nrOfOpsOnQubit) {
@@ -158,6 +168,8 @@ SatEncoder::preprocessCircuit(const qc::DAG&                  dag,
               gate->getControls()
                   .begin()
                   ->qubit; // we assume we only have 1 control
+
+          std::cerr << "Processing gate " << gate->getName() << "\n";
 
           for (auto& currState : states) {
             if (gate->getType() == qc::OpType::H) {
@@ -196,6 +208,7 @@ SatEncoder::preprocessCircuit(const qc::DAG&                  dag,
       }
     }
     for (auto& state : states) {
+      std::cerr << "Processing state: " << state.prevGenId << "\n";
       auto        currLevelGen = state.getLevelGenerator();
       auto        inspair      = generators.emplace(currLevelGen, uniqueGenCnt);
       std::size_t id;
