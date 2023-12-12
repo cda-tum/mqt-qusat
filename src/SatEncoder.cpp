@@ -11,17 +11,22 @@ bool SatEncoder::testEqual(qc::QuantumComputation&         circuitOne,
     std::cerr << "Both circuits must be non-empy" << std::endl;
     return false;
   }
+  std::cout << "Entering testEqual\n";
   stats.nrOfDiffInputStates = inputs.size();
   stats.nrOfQubits          = circuitOne.getNqubits();
   qc::DAG dagOne            = qc::CircuitOptimizer::constructDAG(circuitOne);
   qc::DAG dagTwo            = qc::CircuitOptimizer::constructDAG(circuitTwo);
+  std::cout << "DAGs constructed\n";
   SatEncoder::CircuitRepresentation circOneRep =
       preprocessCircuit(dagOne, inputs);
+  std::cout << "First circuit preprocessed\n";
   SatEncoder::CircuitRepresentation circTwoRep =
       preprocessCircuit(dagTwo, inputs);
+  std::cout << "Second circuit preprocessed\n";
   z3::context ctx{};
   z3::solver  solver(ctx);
   constructMiterInstance(circOneRep, circTwoRep, solver);
+  std::cout << "Miter instance constructed\n";
 
   bool equal  = !isSatisfiable(solver);
   stats.equal = equal;
