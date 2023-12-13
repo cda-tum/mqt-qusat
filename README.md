@@ -1,20 +1,22 @@
 [![PyPI](https://img.shields.io/pypi/v/mqt.qusat?logo=pypi&style=flat-square)](https://pypi.org/project/mqt.qusat/)
 ![OS](https://img.shields.io/badge/os-linux%20%7C%20macos%20%7C%20windows-blue?style=flat-square)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)](https://opensource.org/licenses/MIT)
-[![CI](https://img.shields.io/github/actions/workflow/status/cda-tum/qusat/ci.yml?branch=main&style=flat-square&logo=github&label=c%2B%2B)](https://github.com/cda-tum/qusat/actions/workflows/ci.yml)
-[![Bindings](https://img.shields.io/github/actions/workflow/status/cda-tum/qusat/deploy.yml?branch=main&style=flat-square&logo=github&label=packaging)](https://github.com/cda-tum/qusat/actions/workflows/deploy.yml)
-[![codecov](https://img.shields.io/codecov/c/github/cda-tum/qusat?style=flat-square&logo=codecov)](https://codecov.io/gh/cda-tum/qusat)
+[![CI](https://img.shields.io/github/actions/workflow/status/cda-tum/mqt-qusat/ci.yml?branch=main&style=flat-square&logo=github&label=ci)](https://github.com/cda-tum/mqt-qusat/actions/workflows/ci.yml)
+[![CD](https://img.shields.io/github/actions/workflow/status/cda-tum/mqt-qusat/cd.yml?style=flat-square&logo=github&label=cd)](https://github.com/cda-tum/mqt-qusat/actions/workflows/cd.yml)
+[![codecov](https://img.shields.io/codecov/c/github/cda-tum/mqt-qusat?style=flat-square&logo=codecov)](https://codecov.io/gh/cda-tum/mqt-qusat)
+
+> [!NOTE]
+> This project is currently in low maintenance mode. We will still fix bugs and accept pull requests, but we will not actively develop new features.
 
 # MQT QuSAT - A Tool for Utilizing SAT in Quantum Computing
 
-A tool for utilizing satisfiablity testing (SAT) techniques in quantum computing developed by the Chair for Design Automation at
-the [Technical University of Munich](https://www.tum.de/) based on methods proposed in:
+A tool for utilizing satisfiablity testing (SAT) techniques in quantum computing developed as part of the [_Munich Quantum Toolkit_](https://mqt.readthedocs.io) (_MQT_) by the [Chair for Design Automation](https://www.cda.cit.tum.de/) at the [Technical University of Munich](https://www.tum.de/) based on methods proposed in:
 
 - [[1]](https://arxiv.org/abs/2203.00698) L. Berent, L. Burgholzer, and R. Wille. Towards a Satisfiability Encoding for Quantum Circuits. 2022.
 
-QuSAT is part of the Munich Quantum Toolkit (MQT) and builds upon [MQT Core](https://github.com/cda-tum/mqt-core).
+QuSAT builds upon [MQT Core](https://github.com/cda-tum/mqt-core), which forms the backbone of the MQT.
 
-The project is in active development and can currently be used to
+The project can be used to
 
 - Encode Clifford circuits in SAT
 - Check the equivalence of Clifford circuits using SAT
@@ -54,7 +56,7 @@ The SMT Solver [Z3 >= 4.8.3](https://github.com/Z3Prover/z3) has to be installed
 To start off, clone this repository using
 
 ```shell
-git clone https://github.com/cda-tum/qusat --recursive
+git clone https://github.com/cda-tum/mqt-qusat --recursive
 ```
 
 Note the `--recursive` flag. It is required to also clone all the required submodules.
@@ -63,7 +65,7 @@ If you happen to forget passing the flag on your initial clone, you can initiali
 The project uses CMake as the main build configuration tool. Building a project using CMake is a two-stage process. First, CMake needs to be _configured_ by calling
 
 ```shell
-cmake -S . -B build -DBUILD_QUSAT_TESTS=ON -DZ3_ROOT=/path/to/z3/
+cmake -S . -B build -DBUILD_MQT_QUSAT_TESTS=ON -DZ3_ROOT=/path/to/z3/
 ```
 
 This tells CMake to search the current directory `.` (passed via `-S`) for a _CMakeLists.txt_ file and process it into a directory `build` (passed via `-B`). If your installation of Z3 is recent enough, the `Z3_ROOT` can typically be omitted.

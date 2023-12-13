@@ -1,6 +1,5 @@
-cmake_minimum_required(VERSION 3.19)
-cmake_policy(SET CMP0069 NEW)
-set(CMAKE_POLICY_DEFAULT_CMP0069 NEW)
+# set required cmake version
+cmake_minimum_required(VERSION 3.19...3.27)
 
 project(
   qusat
@@ -20,6 +19,27 @@ endmacro()
 
 check_submodule_present(mqt-core)
 
+option(BUILD_MQT_QUSAT_BINDINGS "Build the MQT QUSAT Python bindings" OFF)
+if(BUILD_MQT_QUSAT_BINDINGS)
+  # ensure that the BINDINGS option is set
+  set(BINDINGS
+      ON
+      CACHE BOOL "Enable settings related to Python bindings" FORCE)
+  # cmake-lint: disable=C0103
+  set(Python_FIND_VIRTUALENV
+      FIRST
+      CACHE STRING "Give precedence to virtualenvs when searching for Python")
+  # cmake-lint: disable=C0103
+  set(Python_ARTIFACTS_INTERACTIVE
+      ON
+      CACHE BOOL "Prevent multiple searches for Python and instead cache the results.")
+  # top-level call to find Python
+  find_package(
+    Python 3.8 REQUIRED
+    COMPONENTS Interpreter Development.Module
+    OPTIONAL_COMPONENTS Development.SABIModule)
+endif()
+
 # Add path for custom modules
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
@@ -30,15 +50,9 @@ find_package(Z3 REQUIRED)
 add_subdirectory(src)
 
 # add test code
-option(BUILD_QUSAT_TESTS "Also build tests for QUSAT project")
-if(BUILD_QUSAT_TESTS)
+option(BUILD_MQT_QUSAT_TESTS "Also build tests for the MQT QUSAT project" ON)
+if(BUILD_MQT_QUSAT_TESTS)
   enable_testing()
   include(GoogleTest)
   add_subdirectory(test)
-endif()
-
-# add Python binding code
-option(BINDINGS "Configure for building Python bindings")
-if(BINDINGS)
-  add_subdirectory(mqt/qusat)
 endif()

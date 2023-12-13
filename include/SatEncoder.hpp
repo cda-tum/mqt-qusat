@@ -70,7 +70,6 @@ private:
     void applyCNOT(unsigned long control, unsigned long target);
     void applyH(unsigned long target);
     void applyS(unsigned long target);
-    void printStateTableau();
   };
 
   class CircuitRepresentation {

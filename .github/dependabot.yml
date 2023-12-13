@@ -4,19 +4,13 @@ updates:
     directory: "/"
     schedule:
       interval: "monthly"
-      day: "friday"
-      time: "06:00"
 
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
-      interval: "weekly"
-      day: "friday"
-      time: "06:00"
+      interval: "monthly"
 
   - package-ecosystem: "pip"
     directory: "/"
     schedule:
-      interval: "weekly"
-      day: "friday"
-      time: "06:00"
+      interval: "monthly"

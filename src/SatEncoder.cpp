@@ -145,20 +145,16 @@ SatEncoder::preprocessCircuit(const qc::DAG&                  dag,
         if (!dag.at(qubitCnt).empty() &&
             dag.at(qubitCnt).at(levelCnt) != nullptr) {
           stats.nrOfGates++;
-          auto          gate = dag.at(qubitCnt).at(levelCnt)->get();
-          unsigned long target =
+          auto       gate = dag.at(qubitCnt).at(levelCnt)->get();
+          const auto target =
               gate->getTargets().at(0U); // we assume we only have 1 target
-          unsigned long control =
-              gate->getControls()
-                  .begin()
-                  ->qubit; // we assume we only have 1 control
 
           for (auto& currState : states) {
             if (gate->getType() == qc::OpType::H) {
               currState.applyH(target);
             } else if (gate->getType() == qc::OpType::S) {
               currState.applyS(target);
-            } else if (gate->getType() == qc::OpType::Sdag) {
+            } else if (gate->getType() == qc::OpType::Sdg) {
               currState.applyS(target); // Sdag == SSS
               currState.applyS(target);
               currState.applyS(target);
@@ -179,6 +175,10 @@ SatEncoder::preprocessCircuit(const qc::DAG&                  dag,
               currState.applyS(target);
             } else if (gate->isControlled() &&
                        gate->getType() == qc::OpType::X) { // CNOT
+              const auto control =
+                  gate->getControls()
+                      .begin()
+                      ->qubit; // we assume we only have 1 control
               if (qubitCnt ==
                   control) { // CNOT is for control and target in DAG, only
                              // apply if current qubit is control
@@ -200,8 +200,8 @@ SatEncoder::preprocessCircuit(const qc::DAG&                  dag,
         id = generators.at(currLevelGen);
       }
       representation.idGeneratorMap.emplace(id, currLevelGen);
-      representation.generatorMappings.at(levelCnt).insert(
-          std::make_pair(state.prevGenId, id));
+      representation.generatorMappings.at(levelCnt).emplace(state.prevGenId,
+                                                            id);
       state.prevGenId = id;
     }
   }
@@ -411,7 +411,7 @@ bool SatEncoder::isClifford(const qc::QuantumComputation& qc) {
   for (const auto& op : qc) {
     opType = op->getType();
     if (opType != qc::OpType::H && opType != qc::OpType::S &&
-        opType != qc::OpType::Sdag && opType != qc::OpType::X &&
+        opType != qc::OpType::Sdg && opType != qc::OpType::X &&
         opType != qc::OpType::Z && opType != qc::OpType::Y &&
         opType != qc::OpType::I) {
       return false;
@@ -427,16 +427,12 @@ std::vector<std::vector<bool>> SatEncoder::QState::getLevelGenerator() const {
   for (std::size_t i = 0U; i < n; i++) {
     std::vector<bool> gen(size);
     for (std::size_t j = 0U; j < n; j++) {
-      gen[j] = x.at(i)[j];
+      gen[j] = x.at(i).at(j);
     }
     for (std::size_t j = 0; j < n; j++) {
-      gen[n + j] = z.at(i)[j];
+      gen[n + j] = z.at(i).at(j);
     }
-    if (r.at(i) == 1) {
-      gen[n + n] = true;
-    } else {
-      gen[n + n] = false; // either 0 or 1 possible for phase
-    }
+    gen[n + n] = r.at(i) == 1;
     result.emplace_back(gen);
   }
 
@@ -454,12 +450,8 @@ SatEncoder::QState SatEncoder::initializeState(unsigned long      nrOfQubits,
   result.r = std::vector<int>(nrOfQubits, 0);
 
   for (std::size_t i = 0U; i < nrOfQubits; i++) {
-    for (std::size_t j = 0U; j < nrOfQubits; j++) {
-      if (i == j) {
-        result.z[i][j] = true; // initial 0..0 state corresponds to x matrix all
-                               // zero and z matrix = Id_n
-      }
-    }
+    result.z[i][i] = true; // initial 0..0 state corresponds to x matrix all
+                           // zero and z matrix = Id_n
   }
 
   if (!input.empty()) { //
@@ -498,7 +490,7 @@ const Statistics& SatEncoder::getStats() const { return stats; }
 
 void SatEncoder::QState::applyCNOT(unsigned long control,
                                    unsigned long target) {
-  if (target > n || control > n) {
+  if (target >= n || control >= n) {
     return;
   }
   for (std::size_t i = 0U; i < n; ++i) {
@@ -509,7 +501,7 @@ void SatEncoder::QState::applyCNOT(unsigned long control,
 }
 
 void SatEncoder::QState::applyH(unsigned long target) {
-  if (target > n) {
+  if (target >= n) {
     return;
   }
   for (std::size_t i = 0U; i < n; i++) {
@@ -521,28 +513,11 @@ void SatEncoder::QState::applyH(unsigned long target) {
 }
 
 void SatEncoder::QState::applyS(unsigned long target) {
-  if (target > n) {
+  if (target >= n) {
     return;
   }
   for (std::size_t i = 0U; i < n; ++i) {
     r[i] ^= x[i][target] * z[i][target];
     z[i][target] = z[i][target] ^ x[i][target];
   }
-}
-
-void SatEncoder::QState::printStateTableau() {
-  std::cout << std::endl;
-  for (std::size_t i = 0U; i < n; i++) {
-    for (std::size_t j = 0U; j < n; j++) {
-      std::cout << x.at(i)[j];
-    }
-    std::cout << "|";
-    for (std::size_t j = 0U; j < n; j++) {
-      std::cout << z.at(i)[j];
-    }
-    std::cout << "|";
-    std::cout << r.at(i);
-    std::cout << std::endl;
-  }
-  std::cout << std::endl;
 }

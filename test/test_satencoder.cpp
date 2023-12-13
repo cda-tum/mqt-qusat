@@ -18,7 +18,7 @@ TEST_F(SatEncoderTest, CheckEqualWhenEqualRandomCircuits) {
   std::mt19937              gen(rd());
   qc::RandomCliffordCircuit circOne(2, 1, gen());
   qc::CircuitOptimizer::flattenOperations(circOne);
-  auto circTwo = circOne.clone();
+  auto circTwo = circOne;
 
   SatEncoder satEncoder;
   bool       result = satEncoder.testEqual(circOne, circTwo);
@@ -45,7 +45,7 @@ TEST_F(SatEncoderTest, CheckEqualWhenNotEqualRandomCircuits) {
   }
 
   qc::CircuitOptimizer::flattenOperations(circOne);
-  auto circTwo = circOne.clone();
+  auto circTwo = circOne;
 
   circTwo.erase(circTwo.begin());
 
@@ -59,7 +59,7 @@ TEST_F(SatEncoderTest, CheckEqualWhenEqualRandomCircuitsWithInputs) {
   std::mt19937              gen(rd());
   qc::RandomCliffordCircuit circOne(50, 10, gen());
   qc::CircuitOptimizer::flattenOperations(circOne);
-  auto circTwo = circOne.clone();
+  auto circTwo = circOne;
 
   SatEncoder               satEncoder;
   std::vector<std::string> inputs;
@@ -272,8 +272,8 @@ TEST_F(SatEncoderBenchmarking,
     std::ofstream outfile(benchmarkFilesPath + "EC-" + timestamp + ".json");
     outfile << "{ \"benchmarks\" : [";
 
-    auto                            ipts = getAllCompBasisStates(5);
-    std::uniform_int_distribution<> distr(0, 31);
+    auto                                       ipts = getAllCompBasisStates(5);
+    std::uniform_int_distribution<std::size_t> distr(0U, 31U);
 
     for (; qubitCnt < maxNrOfQubits; qubitCnt += stepsize) {
       std::cout << "Nr Qubits: " << qubitCnt << std::endl;
@@ -285,7 +285,7 @@ TEST_F(SatEncoderBenchmarking,
 
       qc::RandomCliffordCircuit circOne(qubitCnt, depth, gen());
       qc::CircuitOptimizer::flattenOperations(circOne);
-      auto circTwo = circOne.clone();
+      auto circTwo = circOne;
       if (qubitCnt != 4) {
         outfile << ", ";
       }
@@ -307,10 +307,10 @@ TEST_F(SatEncoderBenchmarking,
         SatEncoder                satEncoder1;
         qc::RandomCliffordCircuit circThree(qubitCnt, depth, gen());
         qc::CircuitOptimizer::flattenOperations(circThree);
-        auto                            circFour = circThree.clone();
-        std::uniform_int_distribution<> distr2(
-            0, circFour.size()); // random error location in circuit
-        circFour.erase(circFour.begin() + distr2(gen));
+        auto                                       circFour = circThree;
+        std::uniform_int_distribution<std::size_t> distr2(
+            0U, circFour.size()); // random error location in circuit
+        circFour.erase(circFour.begin() + static_cast<int>(distr2(gen)));
         outfile << ", ";
         result = satEncoder1.testEqual(circThree, circFour,
                                        inputs); // non-equivalent case
