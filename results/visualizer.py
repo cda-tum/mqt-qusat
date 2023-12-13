@@ -29,24 +29,32 @@ def plotEC() -> None:
     rows = []
 
     for row in range(eqIdx):
-        rows.append([
-            df[row]["nrOfQubits"],
-            df[row]["numGates"],
-            (df[row]["preprocTime"] + df[row]["satConstructionTime"]) / 1000,
-            (df[row]["solvingTime"]) / 1000,
-            int(df[row]["z3map"]["sat conflicts"]) if "sat conflicts" in df[row]["z3map"] else 0,
-        ])
+        rows.append(
+            [
+                df[row]["nrOfQubits"],
+                df[row]["numGates"],
+                (df[row]["preprocTime"] + df[row]["satConstructionTime"]) / 1000,
+                (df[row]["solvingTime"]) / 1000,
+                int(df[row]["z3map"]["sat conflicts"])
+                if "sat conflicts" in df[row]["z3map"]
+                else 0,
+            ]
+        )
 
     ueqIdx = len(df) - eqIdx
     rows2 = []
     for row in range(ueqIdx, len(df), 1):
-        rows2.append([
-            df[row]["nrOfQubits"],
-            df[row]["numGates"],
-            (df[row]["preprocTime"] + df[row]["satConstructionTime"]) / 1000,
-            (df[row]["solvingTime"]) / 1000,
-            int(df[row]["z3map"]["sat conflicts"]) if "sat conflicts" in df[row]["z3map"] else 0,
-        ])
+        rows2.append(
+            [
+                df[row]["nrOfQubits"],
+                df[row]["numGates"],
+                (df[row]["preprocTime"] + df[row]["satConstructionTime"]) / 1000,
+                (df[row]["solvingTime"]) / 1000,
+                int(df[row]["z3map"]["sat conflicts"])
+                if "sat conflicts" in df[row]["z3map"]
+                else 0,
+            ]
+        )
     with Path("", "w").open() as outfile:
         writer = csv.writer(outfile)
         for i in range(len(rows)):
@@ -131,10 +139,18 @@ def plotScaling() -> None:
         clauses2 = []
         clauses3 = []
         for i in range(0, stepsize, 1):
-            time.append(dfQB[row + i]["preprocTime"] + dfQB[row + i]["satConstructionTime"])
-            time1.append(dfQB1[row + i]["preprocTime"] + dfQB1[row + i]["satConstructionTime"])
-            time2.append(dfQB2[row + i]["preprocTime"] + dfQB2[row + i]["satConstructionTime"])
-            time3.append(dfQB3[row + i]["preprocTime"] + dfQB3[row + i]["satConstructionTime"])
+            time.append(
+                dfQB[row + i]["preprocTime"] + dfQB[row + i]["satConstructionTime"]
+            )
+            time1.append(
+                dfQB1[row + i]["preprocTime"] + dfQB1[row + i]["satConstructionTime"]
+            )
+            time2.append(
+                dfQB2[row + i]["preprocTime"] + dfQB2[row + i]["satConstructionTime"]
+            )
+            time3.append(
+                dfQB3[row + i]["preprocTime"] + dfQB3[row + i]["satConstructionTime"]
+            )
 
             twocls = dfQB[row + i]["z3map"].get("sat mk clause 2ary", 0)
             twocls1 = dfQB1[row + i]["z3map"].get("sat mk clause 2ary", 0)
@@ -176,10 +192,18 @@ def plotScaling() -> None:
         clauses2 = []
         clauses3 = []
         for i in range(0, stepsize, 1):
-            time.append(dfCS[row + i]["preprocTime"] + dfCS[row + i]["satConstructionTime"])
-            time1.append(dfCS1[row + i]["preprocTime"] + dfCS1[row + i]["satConstructionTime"])
-            time2.append(dfCS2[row + i]["preprocTime"] + dfCS2[row + i]["satConstructionTime"])
-            time3.append(dfCS3[row + i]["preprocTime"] + dfCS3[row + i]["satConstructionTime"])
+            time.append(
+                dfCS[row + i]["preprocTime"] + dfCS[row + i]["satConstructionTime"]
+            )
+            time1.append(
+                dfCS1[row + i]["preprocTime"] + dfCS1[row + i]["satConstructionTime"]
+            )
+            time2.append(
+                dfCS2[row + i]["preprocTime"] + dfCS2[row + i]["satConstructionTime"]
+            )
+            time3.append(
+                dfCS3[row + i]["preprocTime"] + dfCS3[row + i]["satConstructionTime"]
+            )
 
             twocls = dfCS[row + i]["z3map"].get("sat mk clause 2ary", 0)
             twocls1 = dfCS1[row + i]["z3map"].get("sat mk clause 2ary", 0)
@@ -217,10 +241,26 @@ def plotScaling() -> None:
     optimizedParameters1, pcov1 = opt.curve_fit(QuadFun, xDataQB, dataQBtime1)
     optimizedParameters2, pcov2 = opt.curve_fit(QuadFun, xDataQB, dataQBtime2)
     optimizedParameters3, pcov3 = opt.curve_fit(QuadFun, xDataQB, dataQBtime3)
-    func = str(math.ceil(optimizedParameters[1])) + "x^2+" + str(math.ceil(optimizedParameters[0]))
-    func1 = str(math.ceil(optimizedParameters1[1])) + "x^2+" + str(math.ceil(optimizedParameters1[0]))
-    func2 = str(math.ceil(optimizedParameters2[1])) + "x^2+" + str(math.ceil(optimizedParameters2[0]))
-    func3 = str(math.ceil(optimizedParameters3[1])) + "x^2+" + str(math.ceil(optimizedParameters3[0]))
+    func = (
+        str(math.ceil(optimizedParameters[1]))
+        + "x^2+"
+        + str(math.ceil(optimizedParameters[0]))
+    )
+    func1 = (
+        str(math.ceil(optimizedParameters1[1]))
+        + "x^2+"
+        + str(math.ceil(optimizedParameters1[0]))
+    )
+    func2 = (
+        str(math.ceil(optimizedParameters2[1]))
+        + "x^2+"
+        + str(math.ceil(optimizedParameters2[0]))
+    )
+    func3 = (
+        str(math.ceil(optimizedParameters3[1]))
+        + "x^2+"
+        + str(math.ceil(optimizedParameters3[0]))
+    )
     print("Param for 0,0 fits:" + func + ",", func1 + "," + func2 + "," + func3)
     ax[0, 0].plot(xDataQB, QuadFun(xDataQB, *optimizedParameters), color="b")
     ax[0, 0].plot(xDataQB, QuadFun(xDataQB, *optimizedParameters1), color="r")
@@ -235,15 +275,33 @@ def plotScaling() -> None:
     ax[0, 1].plot(xDataQB, dataQBclauses, "o", label="Depth 10", color="b", alpha=0.2)
     ax[0, 1].plot(xDataQB, dataQBclauses1, "s", label="Depth 50", color="r", alpha=0.2)
     ax[0, 1].plot(xDataQB, dataQBclauses2, "v", label="Depth 250", color="m", alpha=0.2)
-    ax[0, 1].plot(xDataQB, dataQBclauses3, "d", label="Depth 1000", color="g", alpha=0.2)
+    ax[0, 1].plot(
+        xDataQB, dataQBclauses3, "d", label="Depth 1000", color="g", alpha=0.2
+    )
     optimizedParameters, pcov = opt.curve_fit(ConstFun, xDataQB, dataQBclauses)
     optimizedParameters1, pcov1 = opt.curve_fit(ConstFun, xDataQB, dataQBclauses1)
     optimizedParameters2, pcov2 = opt.curve_fit(ConstFun, xDataQB, dataQBclauses2)
     optimizedParameters3, pcov3 = opt.curve_fit(ConstFun, xDataQB, dataQBclauses3)
-    func = str(math.ceil(optimizedParameters[1])) + "+" + str(math.ceil(optimizedParameters[0]))
-    func1 = str(math.ceil(optimizedParameters1[1])) + "+" + str(math.ceil(optimizedParameters1[0]))
-    func2 = str(math.ceil(optimizedParameters2[1])) + "+" + str(math.ceil(optimizedParameters2[0]))
-    func3 = str(math.ceil(optimizedParameters3[1])) + "+" + str(math.ceil(optimizedParameters3[0]))
+    func = (
+        str(math.ceil(optimizedParameters[1]))
+        + "+"
+        + str(math.ceil(optimizedParameters[0]))
+    )
+    func1 = (
+        str(math.ceil(optimizedParameters1[1]))
+        + "+"
+        + str(math.ceil(optimizedParameters1[0]))
+    )
+    func2 = (
+        str(math.ceil(optimizedParameters2[1]))
+        + "+"
+        + str(math.ceil(optimizedParameters2[0]))
+    )
+    func3 = (
+        str(math.ceil(optimizedParameters3[1]))
+        + "+"
+        + str(math.ceil(optimizedParameters3[0]))
+    )
     print("Param for 0,1 fits:" + func + ",", func1 + "," + func2 + "," + func3)
     ax[0, 1].plot(xDataQB, ConstFun(xDataQB, *optimizedParameters), color="b")
     ax[0, 1].plot(xDataQB, ConstFun(xDataQB, *optimizedParameters1), color="r")
@@ -274,10 +332,26 @@ def plotScaling() -> None:
     optimizedParameters1, pcov1 = opt.curve_fit(LinFun, xDataCS, dataCStime1)
     optimizedParameters2, pcov2 = opt.curve_fit(LinFun, xDataCS, dataCStime2)
     optimizedParameters3, pcov3 = opt.curve_fit(LinFun, xDataCS, dataCStime3)
-    func = str(math.ceil(optimizedParameters[1])) + "x+" + str(math.ceil(optimizedParameters[0]))
-    func1 = str(math.ceil(optimizedParameters1[1])) + "x+" + str(math.ceil(optimizedParameters1[0]))
-    func2 = str(math.ceil(optimizedParameters2[1])) + "x+" + str(math.ceil(optimizedParameters2[0]))
-    func3 = str(math.ceil(optimizedParameters3[1])) + "x+" + str(math.ceil(optimizedParameters3[0]))
+    func = (
+        str(math.ceil(optimizedParameters[1]))
+        + "x+"
+        + str(math.ceil(optimizedParameters[0]))
+    )
+    func1 = (
+        str(math.ceil(optimizedParameters1[1]))
+        + "x+"
+        + str(math.ceil(optimizedParameters1[0]))
+    )
+    func2 = (
+        str(math.ceil(optimizedParameters2[1]))
+        + "x+"
+        + str(math.ceil(optimizedParameters2[0]))
+    )
+    func3 = (
+        str(math.ceil(optimizedParameters3[1]))
+        + "x+"
+        + str(math.ceil(optimizedParameters3[0]))
+    )
     print("Param for 1,0 fits:" + func + ",", func1 + "," + func2 + "," + func3)
     ax[1, 0].plot(xDataCS, LinFun(xDataCS, *optimizedParameters), color="b")
     ax[1, 0].plot(xDataCS, LinFun(xDataCS, *optimizedParameters1), color="r")
@@ -291,15 +365,33 @@ def plotScaling() -> None:
     ax[1, 1].plot(xDataCS, dataCSclauses, "o", label="5 Qubits", color="b", alpha=0.2)
     ax[1, 1].plot(xDataCS, dataCSclauses1, "s", label="20 Qubits", color="r", alpha=0.2)
     ax[1, 1].plot(xDataCS, dataCSclauses2, "v", label="65 Qubits", color="m", alpha=0.2)
-    ax[1, 1].plot(xDataCS, dataCSclauses3, "d", label="127 Qubits", color="g", alpha=0.2)
+    ax[1, 1].plot(
+        xDataCS, dataCSclauses3, "d", label="127 Qubits", color="g", alpha=0.2
+    )
     optimizedParameters, pcov = opt.curve_fit(LinFun, xDataCS, dataCSclauses)
     optimizedParameters1, pcov1 = opt.curve_fit(LinFun, xDataCS, dataCSclauses1)
     optimizedParameters2, pcov2 = opt.curve_fit(LinFun, xDataCS, dataCSclauses2)
     optimizedParameters3, pcov3 = opt.curve_fit(LinFun, xDataCS, dataCSclauses3)
-    func = str(math.ceil(optimizedParameters[1])) + "x+" + str(math.ceil(optimizedParameters[0]))
-    func1 = str(math.ceil(optimizedParameters1[1])) + "x+" + str(math.ceil(optimizedParameters1[0]))
-    func2 = str(math.ceil(optimizedParameters2[1])) + "x+" + str(math.ceil(optimizedParameters2[0]))
-    func3 = str(math.ceil(optimizedParameters3[1])) + "x+" + str(math.ceil(optimizedParameters3[0]))
+    func = (
+        str(math.ceil(optimizedParameters[1]))
+        + "x+"
+        + str(math.ceil(optimizedParameters[0]))
+    )
+    func1 = (
+        str(math.ceil(optimizedParameters1[1]))
+        + "x+"
+        + str(math.ceil(optimizedParameters1[0]))
+    )
+    func2 = (
+        str(math.ceil(optimizedParameters2[1]))
+        + "x+"
+        + str(math.ceil(optimizedParameters2[0]))
+    )
+    func3 = (
+        str(math.ceil(optimizedParameters3[1]))
+        + "x+"
+        + str(math.ceil(optimizedParameters3[0]))
+    )
     print("Param for 1,1 fits:" + func + ",", func1 + "," + func2 + "," + func3)
     ax[1, 1].plot(xDataCS, LinFun(xDataCS, *optimizedParameters), color="b")
     ax[1, 1].plot(xDataCS, LinFun(xDataCS, *optimizedParameters1), color="r")
@@ -383,6 +475,7 @@ def plotGenerators() -> None:
     optimizedParameters1, pcov2 = opt.curve_fit(QuadFun, xData1, yData1)
     optimizedParameters2, pcov2 = opt.curve_fit(QuadFun, xData2, yData2)
 
+    ax.plot(xData, QuadFun(xData, *optimizedParameters), color="b")
     ax.plot(xData1, QuadFun(xData1, *optimizedParameters1), color="r")
     ax.plot(xData2, QuadFun(xData2, *optimizedParameters2), color="m")
 
