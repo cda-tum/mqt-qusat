@@ -3,7 +3,6 @@
 bool SatEncoder::testEqual(qc::QuantumComputation&         circuitOne,
                            qc::QuantumComputation&         circuitTwo,
                            const std::vector<std::string>& inputs) {
-  std::cerr << "Entering testEqual\n";
   if (!isClifford(circuitOne) || !isClifford(circuitTwo)) {
     std::cerr << "Circuits are not Clifford circuits" << std::endl;
     return false;
@@ -12,22 +11,17 @@ bool SatEncoder::testEqual(qc::QuantumComputation&         circuitOne,
     std::cerr << "Both circuits must be non-empy" << std::endl;
     return false;
   }
-  std::cerr << "Circuits are Clifford circuits and non-empty\n";
   stats.nrOfDiffInputStates = inputs.size();
   stats.nrOfQubits          = circuitOne.getNqubits();
   qc::DAG dagOne            = qc::CircuitOptimizer::constructDAG(circuitOne);
   qc::DAG dagTwo            = qc::CircuitOptimizer::constructDAG(circuitTwo);
-  std::cerr << "DAGs constructed\n";
   SatEncoder::CircuitRepresentation circOneRep =
       preprocessCircuit(dagOne, inputs);
-  std::cerr << "First circuit preprocessed\n";
   SatEncoder::CircuitRepresentation circTwoRep =
       preprocessCircuit(dagTwo, inputs);
-  std::cerr << "Second circuit preprocessed\n";
   z3::context ctx{};
   z3::solver  solver(ctx);
   constructMiterInstance(circOneRep, circTwoRep, solver);
-  std::cerr << "Miter instance constructed\n";
 
   bool equal  = !isSatisfiable(solver);
   stats.equal = equal;
@@ -102,8 +96,6 @@ SatEncoder::preprocessCircuit(const qc::DAG&                  dag,
   SatEncoder::CircuitRepresentation representation;
   unsigned long                     nrOfQubits = dag.size();
 
-  std::cerr << "Initializing state\n";
-
   // compute nr of levels of ckt = #generators needed per input state
   std::size_t tmp;
   for (std::size_t i = 0U; i < inputSize; i++) {
@@ -112,8 +104,6 @@ SatEncoder::preprocessCircuit(const qc::DAG&                  dag,
       nrOfLevels = tmp;
     }
   }
-
-  std::cerr << "Computed nr of levels: " << nrOfLevels << "\n";
 
   stats.circuitDepth =
       nrOfLevels > stats.circuitDepth ? nrOfLevels : stats.circuitDepth;
@@ -127,8 +117,6 @@ SatEncoder::preprocessCircuit(const qc::DAG&                  dag,
   } else {
     states.push_back(initializeState(nrOfQubits, {}));
   }
-
-  std::cerr << "Initialized states\n";
 
   // store generators of input state
   for (auto& state : states) {
@@ -144,32 +132,22 @@ SatEncoder::preprocessCircuit(const qc::DAG&                  dag,
     state.prevGenId = id;
   }
 
-  std::cerr << "Stored generators of input state\n";
-
   if (nrOfInputGenerators == 0) { // only in first pass
     nrOfInputGenerators = uniqueGenCnt;
   }
 
   for (std::size_t levelCnt = 0; levelCnt < nrOfLevels; levelCnt++) {
-    std::cerr << "Processing level " << levelCnt << "\n";
     for (std::size_t qubitCnt = 0U; qubitCnt < inputSize;
          qubitCnt++) { // operation of current level for each qubit
-      std::cerr << "Processing qubit " << qubitCnt << "\n";
       nrOfOpsOnQubit = dag.at(qubitCnt).size();
-      std::cerr << "Nr of ops on qubit: " << nrOfOpsOnQubit << "\n";
 
       if (levelCnt < nrOfOpsOnQubit) {
         if (!dag.at(qubitCnt).empty() &&
             dag.at(qubitCnt).at(levelCnt) != nullptr) {
           stats.nrOfGates++;
-          std::cerr << "Processing gate at qubit " << qubitCnt << " and level "
-                    << levelCnt << "\n";
-          auto gate = dag.at(qubitCnt).at(levelCnt)->get();
-          std::cerr << "Gate " << *gate << "\n";
+          auto       gate = dag.at(qubitCnt).at(levelCnt)->get();
           const auto target =
               gate->getTargets().at(0U); // we assume we only have 1 target
-
-          std::cerr << "Processing gate " << gate->getName() << "\n";
 
           for (auto& currState : states) {
             if (gate->getType() == qc::OpType::H) {
@@ -212,7 +190,6 @@ SatEncoder::preprocessCircuit(const qc::DAG&                  dag,
       }
     }
     for (auto& state : states) {
-      std::cerr << "Processing state: " << state.prevGenId << "\n";
       auto        currLevelGen = state.getLevelGenerator();
       auto        inspair      = generators.emplace(currLevelGen, uniqueGenCnt);
       std::size_t id;

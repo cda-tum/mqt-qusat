@@ -36,26 +36,21 @@ TEST_F(SatEncoderTest, CheckErrorWhenEmpty) {
 }
 
 TEST_F(SatEncoderTest, CheckEqualWhenNotEqualRandomCircuits) {
-  std::random_device rd;
-  std::mt19937       gen(rd());
-  std::cout << "CheckEqualWhenNotEqualRandomCircuits" << std::endl;
+  std::random_device        rd;
+  std::mt19937              gen(rd());
   qc::RandomCliffordCircuit circOne(2, 1, gen());
 
   while (circOne.empty()) {
     circOne = qc::RandomCliffordCircuit(2, 1, gen());
   }
-  std::cout << "Generated circuit:\n" << circOne << std::endl;
 
   qc::CircuitOptimizer::flattenOperations(circOne);
-  std::cout << "Flattened circuit:\n" << circOne << std::endl;
   auto circTwo = circOne;
 
   circTwo.erase(circTwo.begin());
-  std::cout << "Modified circuit:\n" << circTwo << std::endl;
 
   SatEncoder satEncoder;
-  std::cout << "Constructed SAT encoder" << std::endl;
-  bool result = satEncoder.testEqual(circOne, circTwo);
+  bool       result = satEncoder.testEqual(circOne, circTwo);
   EXPECT_EQ(result, false);
 }
 
