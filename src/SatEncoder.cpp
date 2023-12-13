@@ -165,13 +165,9 @@ SatEncoder::preprocessCircuit(const qc::DAG&                  dag,
           std::cerr << "Processing gate at qubit " << qubitCnt << " and level "
                     << levelCnt << "\n";
           auto gate = dag.at(qubitCnt).at(levelCnt)->get();
-          std::cerr << "Gate " << gate << "\n";
-          unsigned long target =
+          std::cerr << "Gate " << *gate << "\n";
+          const auto target =
               gate->getTargets().at(0U); // we assume we only have 1 target
-          unsigned long control =
-              gate->getControls()
-                  .begin()
-                  ->qubit; // we assume we only have 1 control
 
           std::cerr << "Processing gate " << gate->getName() << "\n";
 
@@ -201,6 +197,10 @@ SatEncoder::preprocessCircuit(const qc::DAG&                  dag,
               currState.applyS(target);
             } else if (gate->isControlled() &&
                        gate->getType() == qc::OpType::X) { // CNOT
+              const auto control =
+                  gate->getControls()
+                      .begin()
+                      ->qubit; // we assume we only have 1 control
               if (qubitCnt ==
                   control) { // CNOT is for control and target in DAG, only
                              // apply if current qubit is control
