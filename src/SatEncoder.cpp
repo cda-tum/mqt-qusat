@@ -156,12 +156,16 @@ SatEncoder::preprocessCircuit(const qc::DAG&                  dag,
          qubitCnt++) { // operation of current level for each qubit
       std::cerr << "Processing qubit " << qubitCnt << "\n";
       nrOfOpsOnQubit = dag.at(qubitCnt).size();
+      std::cerr << "Nr of ops on qubit: " << nrOfOpsOnQubit << "\n";
 
       if (levelCnt < nrOfOpsOnQubit) {
         if (!dag.at(qubitCnt).empty() &&
             dag.at(qubitCnt).at(levelCnt) != nullptr) {
           stats.nrOfGates++;
-          auto          gate = dag.at(qubitCnt).at(levelCnt)->get();
+          std::cerr << "Processing gate at qubit " << qubitCnt << " and level "
+                    << levelCnt << "\n";
+          auto gate = dag.at(qubitCnt).at(levelCnt)->get();
+          std::cerr << "Gate " << gate << "\n";
           unsigned long target =
               gate->getTargets().at(0U); // we assume we only have 1 target
           unsigned long control =
