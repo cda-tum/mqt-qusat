@@ -9,7 +9,7 @@
 > This project is currently in low maintenance mode. We will still fix bugs and accept pull requests, but we will not
 > actively develop new features.
 
-<p align="center"> 
+<p align="center">
 <a href="https://mqt.readthedocs.io">
     <picture>
       <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/cda-tum/mqt/main/docs/_static/mqt_light.png" width="60%">
@@ -21,7 +21,7 @@
 # MQT QuSAT - A Tool for Utilizing SAT in Quantum Computing
 
 A tool for utilizing satisfiablity testing (SAT) techniques in quantum computing developed as part of the
-[_Munich Quantum Toolkit (MQT)_](https://mqt.readthedocs.io) by the [Chair for Design Automation](https://www.cda.cit.tum.de/) 
+[_Munich Quantum Toolkit (MQT)_](https://mqt.readthedocs.io) by the [Chair for Design Automation](https://www.cda.cit.tum.de/)
 at the [Technical University of Munich](https://www.tum.de/) based on methods proposed in:
 
 - [[1]](https://arxiv.org/abs/2203.00698) L. Berent, L. Burgholzer, and R. Wille. Towards a Satisfiability Encoding for
