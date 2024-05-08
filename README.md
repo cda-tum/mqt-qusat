@@ -9,7 +9,7 @@
 > This project is currently in low maintenance mode. We will still fix bugs and accept pull requests, but we will not
 > actively develop new features.
 
-<p align="center"> 
+<p align="center">
 <a href="https://mqt.readthedocs.io">
     <picture>
       <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/cda-tum/mqt/main/docs/_static/mqt_light.png" width="60%">
