@@ -20,7 +20,7 @@
 
 # MQT QuSAT - A Tool for Utilizing SAT in Quantum Computing
 
-A tool for utilizing satisfiablity testing (SAT) techniques in quantum computing developed as part of the [_Munich Quantum Toolkit (MQT)_](https://mqt.readthedocs.io) by the [Chair for Design Automation](https://www.cda.cit.tum.de/) 
+A tool for utilizing satisfiablity testing (SAT) techniques in quantum computing developed as part of the [_Munich Quantum Toolkit (MQT)_](https://mqt.readthedocs.io) by the [Chair for Design Automation](https://www.cda.cit.tum.de/)
 at the [Technical University of Munich](https://www.tum.de/) based on methods proposed in:
 
 - [[1]](https://arxiv.org/abs/2203.00698) L. Berent, L. Burgholzer, and R. Wille. Towards a Satisfiability Encoding for Quantum Circuits. 2022.
@@ -48,7 +48,7 @@ The experimental data used in the paper is available in `/results` directory.
 
 ## System Requirements
 
-Building (and running) is continuously tested under Linux, MacOS, and Windows using the [latest available system versions for GitHub Actions](https://github.com/actions/virtual-environments). However, the implementation should be 
+Building (and running) is continuously tested under Linux, MacOS, and Windows using the [latest available system versions for GitHub Actions](https://github.com/actions/virtual-environments). However, the implementation should be
 compatible with any current C++ compiler supporting C++17 and a minimum CMake version of 3.19.
 
 The SMT Solver [Z3 >= 4.8.3](https://github.com/Z3Prover/z3) has to be installed and the dynamic linker has to be able to find the library. This can be accomplished in a multitude of ways:
