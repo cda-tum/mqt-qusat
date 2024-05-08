@@ -20,8 +20,8 @@
 
 # MQT QuSAT - A Tool for Utilizing SAT in Quantum Computing
 
-A tool for utilizing satisfiablity testing (SAT) techniques in quantum computing developed as part of the 
-[_Munich Quantum Toolkit (MQT)_](https://mqt.readthedocs.io) by the [Chair for Design Automation](https://www.cda.cit.tum.de/)
+A tool for utilizing satisfiablity testing (SAT) techniques in quantum computing developed as part of the
+[_Munich Quantum Toolkit (MQT)_](https://mqt.readthedocs.io) by the [Chair for Design Automation](https://www.cda.cit.tum.de/) 
 at the [Technical University of Munich](https://www.tum.de/) based on methods proposed in:
 
 - [[1]](https://arxiv.org/abs/2203.00698) L. Berent, L. Burgholzer, and R. Wille. Towards a Satisfiability Encoding for
@@ -120,6 +120,13 @@ If you use our tool for your research, we would appreciate if you refer to it by
       booktitle={International Conference on Theory and Applications of Satisfiability Testing}
 }
 ```
+
+## Acknowledgements
+
+The Munich Quantum Toolkit has been supported by the European
+Research Council (ERC) under the European Union's Horizon 2020 research and innovation program (grant agreement
+No. 101001318), the Bavarian State Ministry for Science and Arts through the Distinguished Professorship Program, as well as the
+Munich Quantum Valley, which is supported by the Bavarian state government with funds from the Hightech Agenda Bayern Plus.
 
 <p align="center">
   <picture>
