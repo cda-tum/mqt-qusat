@@ -6,19 +6,6 @@ project(
   LANGUAGES CXX
   DESCRIPTION "A Tool for Utilizing SAT in Quantum Computing")
 
-# check whether the submodule ``modulename`` is correctly cloned in the ``/extern`` directory.
-macro(CHECK_SUBMODULE_PRESENT modulename)
-  if(NOT EXISTS "${PROJECT_SOURCE_DIR}/extern/${modulename}/CMakeLists.txt")
-    message(
-      FATAL_ERROR
-        "${modulename} submodule not cloned properly. \
-        Please run `git submodule update --init --recursive` \
-        from the main project directory")
-  endif()
-endmacro()
-
-check_submodule_present(mqt-core)
-
 option(BUILD_MQT_QUSAT_BINDINGS "Build the MQT QUSAT Python bindings" OFF)
 if(BUILD_MQT_QUSAT_BINDINGS)
   # ensure that the BINDINGS option is set
