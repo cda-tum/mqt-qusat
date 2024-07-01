@@ -43,8 +43,7 @@ endif()
 # Add path for custom modules
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
-# search for Z3
-find_package(Z3 REQUIRED)
+include(cmake/ExternalDependencies.cmake)
 
 # add main library code
 add_subdirectory(src)
