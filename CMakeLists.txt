@@ -6,20 +6,9 @@ project(
   LANGUAGES CXX
   DESCRIPTION "A Tool for Utilizing SAT in Quantum Computing")
 
-# check whether the submodule ``modulename`` is correctly cloned in the ``/extern`` directory.
-macro(CHECK_SUBMODULE_PRESENT modulename)
-  if(NOT EXISTS "${PROJECT_SOURCE_DIR}/extern/${modulename}/CMakeLists.txt")
-    message(
-      FATAL_ERROR
-        "${modulename} submodule not cloned properly. \
-        Please run `git submodule update --init --recursive` \
-        from the main project directory")
-  endif()
-endmacro()
-
-check_submodule_present(mqt-core)
-
 option(BUILD_MQT_QUSAT_BINDINGS "Build the MQT QUSAT Python bindings" OFF)
+option(BUILD_MQT_QUSAT_TESTS "Also build tests for the MQT QUSAT project" ON)
+
 if(BUILD_MQT_QUSAT_BINDINGS)
   # ensure that the BINDINGS option is set
   set(BINDINGS
@@ -43,14 +32,12 @@ endif()
 # Add path for custom modules
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
-# search for Z3
-find_package(Z3 REQUIRED)
+include(cmake/ExternalDependencies.cmake)
 
 # add main library code
 add_subdirectory(src)
 
 # add test code
-option(BUILD_MQT_QUSAT_TESTS "Also build tests for the MQT QUSAT project" ON)
 if(BUILD_MQT_QUSAT_TESTS)
   enable_testing()
   include(GoogleTest)
