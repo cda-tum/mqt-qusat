@@ -16,7 +16,8 @@ pybind11_add_module(
   # Source code goes here
   bindings.cpp)
 target_compile_definitions(py${PROJECT_NAME} PRIVATE Z3_FOUND)
-target_link_libraries(py${PROJECT_NAME} PRIVATE ${PROJECT_NAME} MQT::CorePython)
+target_link_libraries(py${PROJECT_NAME} PRIVATE ${PROJECT_NAME} MQT::CorePython MQT::ProjectOptions
+                                                MQT::ProjectWarnings)
 
 # Install directive for scikit-build-core
 install(
