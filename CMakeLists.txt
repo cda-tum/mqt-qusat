@@ -7,6 +7,8 @@ project(
   DESCRIPTION "A Tool for Utilizing SAT in Quantum Computing")
 
 option(BUILD_MQT_QUSAT_BINDINGS "Build the MQT QUSAT Python bindings" OFF)
+option(BUILD_MQT_QUSAT_TESTS "Also build tests for the MQT QUSAT project" ON)
+
 if(BUILD_MQT_QUSAT_BINDINGS)
   # ensure that the BINDINGS option is set
   set(BINDINGS
@@ -36,7 +38,6 @@ include(cmake/ExternalDependencies.cmake)
 add_subdirectory(src)
 
 # add test code
-option(BUILD_MQT_QUSAT_TESTS "Also build tests for the MQT QUSAT project" ON)
 if(BUILD_MQT_QUSAT_TESTS)
   enable_testing()
   include(GoogleTest)
