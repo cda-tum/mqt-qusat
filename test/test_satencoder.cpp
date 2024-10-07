@@ -123,7 +123,7 @@ TEST_F(SatEncoderBenchmarking,
       std::random_device rd;
       std::ostringstream oss;
       auto               t = std::time(nullptr);
-      struct tm          now {};
+      struct tm          now{};
       localtime_r(&t, &now);
       oss << std::put_time(&now, "%d-%m-%Y");
       auto filename = oss.str();
@@ -169,7 +169,7 @@ TEST_F(SatEncoderBenchmarking,
       std::random_device rd;
       std::ostringstream oss;
       auto               t = std::time(nullptr);
-      struct tm          now {};
+      struct tm          now{};
       localtime_r(&t, &now);
       oss << std::put_time(&now, "%d-%m-%Y");
       auto filename = oss.str();
@@ -215,7 +215,7 @@ TEST_F(SatEncoderBenchmarking,
       std::random_device rd;
       std::ostringstream oss;
       auto               t = std::time(nullptr);
-      struct tm          now {};
+      struct tm          now{};
       localtime_r(&t, &now);
       oss << std::put_time(&now, "%d-%m-%Y");
       auto filename = oss.str();
@@ -265,7 +265,7 @@ TEST_F(SatEncoderBenchmarking,
     std::mt19937       gen(rd());
     std::mt19937       gen2(rd());
     auto               t = std::time(nullptr);
-    struct tm          now {};
+    struct tm          now{};
     localtime_r(&t, &now);
     oss << std::put_time(&now, "%d-%m-%Y");
     auto timestamp = oss.str();
