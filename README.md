@@ -65,11 +65,8 @@ The SMT Solver [Z3 >= 4.8.3](https://github.com/Z3Prover/z3) has to be installed
 To start off, clone this repository using
 
 ```shell
-git clone https://github.com/cda-tum/mqt-qusat --recursive
+git clone https://github.com/cda-tum/mqt-qusat
 ```
-
-Note the `--recursive` flag. It is required to also clone all the required submodules.
-If you happen to forget passing the flag on your initial clone, you can initialize all the submodules by executing `git submodule update --init --recursive` in the main project directory.
 
 The project uses CMake as the main build configuration tool. Building a project using CMake is a two-stage process. First, CMake needs to be _configured_ by calling
 
