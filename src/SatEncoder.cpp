@@ -9,46 +9,48 @@
 
 #include "SatEncoder.hpp"
 
-bool SatEncoder::testEqual(qc::QuantumComputation&         circuitOne,
+#include "ir/QuantumComputation.hpp"
+
+#include <chrono>
+#include <iostream>
+#include <string>
+#include <vector>
+#include <z3++.h>
+
+bool SatEncoder::testEqual(qc::QuantumComputation&         circuit,
                            qc::QuantumComputation&         circuitTwo,
                            const std::vector<std::string>& inputs) {
-  if (!isClifford(circuitOne) || !isClifford(circuitTwo)) {
+  if (!isClifford(circuit) || !isClifford(circuitTwo)) {
     std::cerr << "Circuits are not Clifford circuits" << std::endl;
     return false;
   }
-  if (circuitOne.empty() || circuitTwo.empty()) {
+  if (circuit.empty() || circuitTwo.empty()) {
     std::cerr << "Both circuits must be non-empy" << std::endl;
     return false;
   }
   stats.nrOfDiffInputStates = inputs.size();
-  stats.nrOfQubits          = circuitOne.getNqubits();
-  qc::CircuitOptimizer::DAG dagOne =
-      qc::CircuitOptimizer::constructDAG(circuitOne);
-  qc::CircuitOptimizer::DAG dagTwo =
-      qc::CircuitOptimizer::constructDAG(circuitTwo);
-  SatEncoder::CircuitRepresentation circOneRep =
-      preprocessCircuit(dagOne, inputs);
-  SatEncoder::CircuitRepresentation circTwoRep =
-      preprocessCircuit(dagTwo, inputs);
-  z3::context ctx{};
-  z3::solver  solver(ctx);
+  stats.nrOfQubits          = circuit.getNqubits();
+  const auto dagOne         = qc::CircuitOptimizer::constructDAG(circuit);
+  const auto dagTwo         = qc::CircuitOptimizer::constructDAG(circuitTwo);
+  const CircuitRepresentation circOneRep = preprocessCircuit(dagOne, inputs);
+  const CircuitRepresentation circTwoRep = preprocessCircuit(dagTwo, inputs);
+  z3::context                 ctx{};
+  z3::solver                  solver(ctx);
   constructMiterInstance(circOneRep, circTwoRep, solver);
 
-  bool equal  = !isSatisfiable(solver);
-  stats.equal = equal;
+  const bool equal = !isSatisfiable(solver);
+  stats.equal      = equal;
 
   return equal;
 }
 
-bool SatEncoder::testEqual(qc::QuantumComputation& circuitOne,
+bool SatEncoder::testEqual(qc::QuantumComputation& circuit,
                            qc::QuantumComputation& circuitTwo) {
-  std::vector<std::string> inputs;
-  return testEqual(circuitOne, circuitTwo, inputs);
+  return testEqual(circuit, circuitTwo, {});
 }
 
 bool SatEncoder::checkSatisfiability(qc::QuantumComputation& circuitOne) {
-  std::vector<std::string> inputs;
-  return checkSatisfiability(circuitOne, inputs);
+  return checkSatisfiability(circuitOne, {});
 }
 
 bool SatEncoder::checkSatisfiability(qc::QuantumComputation&         circuitOne,
@@ -59,9 +61,8 @@ bool SatEncoder::checkSatisfiability(qc::QuantumComputation&         circuitOne,
   }
   stats.nrOfDiffInputStates = inputs.size();
   stats.nrOfQubits          = circuitOne.getNqubits();
-  qc::CircuitOptimizer::DAG dag =
-      qc::CircuitOptimizer::constructDAG(circuitOne);
-  auto        circRep = preprocessCircuit(dag, inputs);
+  const auto  dag           = qc::CircuitOptimizer::constructDAG(circuitOne);
+  const auto  circRep       = preprocessCircuit(dag, inputs);
   z3::context ctx{};
   z3::solver  solver(ctx);
   constructSatInstance(circRep, solver);
@@ -78,19 +79,19 @@ bool SatEncoder::isSatisfiable(z3::solver& solver) {
   auto z3SolvingDuration =
       std::chrono::duration_cast<std::chrono::milliseconds>(after - before)
           .count();
-  stats.solvingTime = z3SolvingDuration;
+  stats.solvingTime = static_cast<std::size_t>(z3SolvingDuration);
 
   if (sat == z3::check_result::sat) {
     stats.satisfiable = true;
   }
 
   for (size_t i = 0; i < solver.statistics().size(); i++) {
-    auto   key = solver.statistics().key(i);
+    auto   key = solver.statistics().key(static_cast<unsigned>(i));
     double val;
-    if (solver.statistics().is_double(i)) {
-      val = solver.statistics().double_value(i);
+    if (solver.statistics().is_double(static_cast<unsigned>(i))) {
+      val = solver.statistics().double_value(static_cast<unsigned>(i));
     } else {
-      val = solver.statistics().uint_value(i);
+      val = solver.statistics().uint_value(static_cast<unsigned>(i));
     }
     stats.z3StatsMap.emplace(key, val);
   }
@@ -100,19 +101,17 @@ bool SatEncoder::isSatisfiable(z3::solver& solver) {
 SatEncoder::CircuitRepresentation
 SatEncoder::preprocessCircuit(const qc::CircuitOptimizer::DAG& dag,
                               const std::vector<std::string>&  inputs) {
-  auto                before     = std::chrono::high_resolution_clock::now();
-  std::size_t         inputSize  = dag.size();
-  std::size_t         nrOfLevels = 0;
-  std::size_t         nrOfOpsOnQubit = 0;
-  std::vector<QState> states;
-  SatEncoder::CircuitRepresentation representation;
-  unsigned long                     nrOfQubits = dag.size();
+  const auto            before     = std::chrono::high_resolution_clock::now();
+  const std::size_t     inputSize  = dag.size();
+  std::size_t           nrOfLevels = 0;
+  std::size_t           nrOfOpsOnQubit = 0;
+  std::vector<QState>   states;
+  CircuitRepresentation representation;
+  const auto            nrOfQubits = dag.size();
 
   // compute nr of levels of ckt = #generators needed per input state
-  std::size_t tmp;
   for (std::size_t i = 0U; i < inputSize; i++) {
-    tmp = dag.at(i).size();
-    if (tmp > nrOfLevels) {
+    if (const auto tmp = dag.at(i).size(); tmp > nrOfLevels) {
       nrOfLevels = tmp;
     }
   }
@@ -157,7 +156,7 @@ SatEncoder::preprocessCircuit(const qc::CircuitOptimizer::DAG& dag,
         if (!dag.at(qubitCnt).empty() &&
             dag.at(qubitCnt).at(levelCnt) != nullptr) {
           stats.nrOfGates++;
-          auto       gate = dag.at(qubitCnt).at(levelCnt)->get();
+          const auto gate = dag.at(qubitCnt).at(levelCnt)->get();
           const auto target =
               gate->getTargets().at(0U); // we assume we only have 1 target
 
@@ -218,16 +217,15 @@ SatEncoder::preprocessCircuit(const qc::CircuitOptimizer::DAG& dag,
     }
   }
   auto after = std::chrono::high_resolution_clock::now();
-  stats.preprocTime +=
+  stats.preprocTime += static_cast<std::size_t>(
       std::chrono::duration_cast<std::chrono::milliseconds>(after - before)
-          .count();
+          .count());
   return representation;
 }
 
 // construct z3 instance from preprocessing information
 void SatEncoder::constructSatInstance(
-    const SatEncoder::CircuitRepresentation& circuitRepresentation,
-    z3::solver&                              solver) {
+    const CircuitRepresentation& circuitRepresentation, z3::solver& solver) {
   auto before = std::chrono::high_resolution_clock::now();
   // number of unique generators that need to be encoded
   const auto generatorCnt = generators.size();
@@ -258,7 +256,8 @@ void SatEncoder::constructSatInstance(
     // create bitvector [x^k]_2 with respective bitwidth for each level k of ckt
     std::stringstream ss{};
     ss << bvName << k; //
-    vars.emplace_back(ctx.bv_const(ss.str().c_str(), bitwidth));
+    vars.emplace_back(
+        ctx.bv_const(ss.str().c_str(), static_cast<unsigned>(bitwidth)));
     stats.nrOfSatVars++;
   }
 
@@ -272,10 +271,11 @@ void SatEncoder::constructSatInstance(
           generators.at(circuitRepresentation.idGeneratorMap.at(to));
 
       // create [x^l]_2 = i => [x^l']_2 = k for each generator mapping
-      const auto left =
-          vars[i] == ctx.bv_val(static_cast<std::uint64_t>(g1), bitwidth);
+      const auto left = vars[i] == ctx.bv_val(static_cast<std::uint64_t>(g1),
+                                              static_cast<unsigned>(bitwidth));
       const auto right =
-          vars[i + 1U] == ctx.bv_val(static_cast<std::uint64_t>(g2), bitwidth);
+          vars[i + 1U] == ctx.bv_val(static_cast<std::uint64_t>(g2),
+                                     static_cast<unsigned>(bitwidth));
       const auto cons = implies(left, right);
       solver.add(cons);
       stats.nrOfFunctionalConstr++;
@@ -284,20 +284,21 @@ void SatEncoder::constructSatInstance(
 
   if (blockingConstraintsNeeded) {
     for (const auto& var : vars) {
-      const auto cons = ult(
-          var, ctx.bv_val(static_cast<std::uint64_t>(generatorCnt), bitwidth));
+      const auto cons =
+          ult(var, ctx.bv_val(static_cast<std::uint64_t>(generatorCnt),
+                              static_cast<unsigned>(bitwidth)));
       solver.add(cons); // [x^l]_2 < m
     }
   }
-  auto after = std::chrono::high_resolution_clock::now();
-  stats.satConstructionTime =
+  auto after                = std::chrono::high_resolution_clock::now();
+  stats.satConstructionTime = static_cast<std::size_t>(
       std::chrono::duration_cast<std::chrono::milliseconds>(after - before)
-          .count();
+          .count());
 }
 
-void SatEncoder::constructMiterInstance(
-    const SatEncoder::CircuitRepresentation& circOneRep,
-    const SatEncoder::CircuitRepresentation& circTwoRep, z3::solver& solver) {
+void SatEncoder::constructMiterInstance(const CircuitRepresentation& circOneRep,
+                                        const CircuitRepresentation& circTwoRep,
+                                        z3::solver&                  solver) {
   auto before = std::chrono::high_resolution_clock::now();
   // number of unique generators that need to be encoded
   const auto generatorCnt = generators.size();
@@ -328,7 +329,8 @@ void SatEncoder::constructMiterInstance(
     // create bitvector [x^k]_2 with respective bitwidth for each level k of ckt
     std::stringstream ss{};
     ss << bvName << k; //
-    const auto tmp = ctx.bv_const(ss.str().c_str(), bitwidth);
+    const auto tmp =
+        ctx.bv_const(ss.str().c_str(), static_cast<unsigned>(bitwidth));
     varsOne.emplace_back(tmp);
     stats.nrOfSatVars++;
   }
@@ -342,9 +344,11 @@ void SatEncoder::constructMiterInstance(
 
       // create [x^l]_2 = i <=> [x^l']_2 = k for each generator mapping
       const auto left =
-          varsOne[i] == ctx.bv_val(static_cast<std::uint64_t>(g1), bitwidth);
-      const auto right = varsOne[i + 1U] ==
-                         ctx.bv_val(static_cast<std::uint64_t>(g2), bitwidth);
+          varsOne[i] == ctx.bv_val(static_cast<std::uint64_t>(g1),
+                                   static_cast<unsigned>(bitwidth));
+      const auto right =
+          varsOne[i + 1U] == ctx.bv_val(static_cast<std::uint64_t>(g2),
+                                        static_cast<unsigned>(bitwidth));
       const auto cons = (left == right);
       solver.add(cons);
       stats.nrOfFunctionalConstr++;
@@ -353,8 +357,9 @@ void SatEncoder::constructMiterInstance(
 
   if (blockingConstraintsNeeded) {
     for (const auto& var : varsOne) {
-      const auto cons = ult(
-          var, ctx.bv_val(static_cast<std::uint64_t>(generatorCnt), bitwidth));
+      const auto cons =
+          ult(var, ctx.bv_val(static_cast<std::uint64_t>(generatorCnt),
+                              static_cast<unsigned>(bitwidth)));
       solver.add(cons); // [x^l]_2 < m
     }
   }
@@ -368,7 +373,8 @@ void SatEncoder::constructMiterInstance(
     // create bitvector [x^k]_2 with respective bitwidth for each level k of ckt
     std::stringstream ss{};
     ss << bvName << k; //
-    const auto tmp = ctx.bv_const(ss.str().c_str(), bitwidth);
+    const auto tmp =
+        ctx.bv_const(ss.str().c_str(), static_cast<unsigned>(bitwidth));
     varsTwo.emplace_back(tmp);
     stats.nrOfSatVars++;
   }
@@ -382,9 +388,11 @@ void SatEncoder::constructMiterInstance(
 
       // create [x^l]_2 = i <=> [x^l']_2 = k for each generator mapping
       const auto left =
-          varsTwo[i] == ctx.bv_val(static_cast<std::uint64_t>(g1), bitwidth);
-      const auto right = varsTwo[i + 1U] ==
-                         ctx.bv_val(static_cast<std::uint64_t>(g2), bitwidth);
+          varsTwo[i] == ctx.bv_val(static_cast<std::uint64_t>(g1),
+                                   static_cast<unsigned>(bitwidth));
+      const auto right =
+          varsTwo[i + 1U] == ctx.bv_val(static_cast<std::uint64_t>(g2),
+                                        static_cast<unsigned>(bitwidth));
       const auto cons = (left == right);
       solver.add(cons);
       stats.nrOfFunctionalConstr++;
@@ -393,8 +401,9 @@ void SatEncoder::constructMiterInstance(
 
   if (blockingConstraintsNeeded) {
     for (const auto& var : varsTwo) {
-      const auto cons = ult(
-          var, ctx.bv_val(static_cast<std::uint64_t>(generatorCnt), bitwidth));
+      const auto cons =
+          ult(var, ctx.bv_val(static_cast<std::uint64_t>(generatorCnt),
+                              static_cast<unsigned>(bitwidth)));
       solver.add(cons); // [x^l]_2 < m
     }
   }
@@ -404,7 +413,8 @@ void SatEncoder::constructMiterInstance(
   const auto equalInputs    = varsOne.front() == varsTwo.front();
   const auto unequalOutputs = varsOne.back() != varsTwo.back();
   const auto nrOfInputs =
-      ctx.bv_val(static_cast<std::uint64_t>(nrOfInputGenerators), bitwidth);
+      ctx.bv_val(static_cast<std::uint64_t>(nrOfInputGenerators),
+                 static_cast<unsigned>(bitwidth));
   const auto input1 = ult(varsOne.front(), nrOfInputs);
   const auto input2 = ult(varsTwo.front(), nrOfInputs);
 
@@ -412,10 +422,10 @@ void SatEncoder::constructMiterInstance(
   solver.add(unequalOutputs);
   solver.add(input1);
   solver.add(input2);
-  auto after = std::chrono::high_resolution_clock::now();
-  stats.satConstructionTime =
+  auto after                = std::chrono::high_resolution_clock::now();
+  stats.satConstructionTime = static_cast<std::size_t>(
       std::chrono::duration_cast<std::chrono::milliseconds>(after - before)
-          .count();
+          .count());
 }
 
 bool SatEncoder::isClifford(const qc::QuantumComputation& qc) {
@@ -453,7 +463,7 @@ std::vector<std::vector<bool>> SatEncoder::QState::getLevelGenerator() const {
 
 SatEncoder::QState SatEncoder::initializeState(unsigned long      nrOfQubits,
                                                const std::string& input) {
-  SatEncoder::QState result;
+  QState result;
   result.n = nrOfQubits;
   result.x =
       std::vector<std::vector<bool>>(nrOfQubits, std::vector<bool>(nrOfQubits));
@@ -493,6 +503,7 @@ SatEncoder::QState SatEncoder::initializeState(unsigned long      nrOfQubits,
         result.applyS(i);
         result.applyS(i);
         break;
+      default:;
       }
     }
   }

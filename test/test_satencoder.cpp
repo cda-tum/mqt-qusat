@@ -7,7 +7,6 @@
 #define localtime_r(a, b) (localtime_s(b, a) == 0 ? b : NULL)
 #endif
 
-#include <filesystem>
 #include <fstream>
 #include <gtest/gtest.h>
 #include <locale>
@@ -136,8 +135,8 @@ TEST_F(SatEncoderBenchmarking,
         for (size_t j = 0; j < 10;
              j++) { // 10 runs with same params for representative sample
           SatEncoder satEncoder;
-          auto       circOne =
-              qc::createRandomCliffordCircuit(nrOfQubits, depth, rd());
+          auto       circOne = qc::createRandomCliffordCircuit(
+              static_cast<qc::Qubit>(nrOfQubits), depth, rd());
           qc::CircuitOptimizer::flattenOperations(circOne);
           if (nrOfQubits != 1U || j != 0U) {
             outfile << ", ";
@@ -183,8 +182,8 @@ TEST_F(SatEncoderBenchmarking,
         for (size_t j = 0; j < 10;
              j++) { // 10 runs with same params for representative sample
           SatEncoder satEncoder;
-          auto       circOne =
-              qc::createRandomCliffordCircuit(nrOfQubits, depth, rd());
+          auto       circOne = qc::createRandomCliffordCircuit(
+              static_cast<qc::Qubit>(nrOfQubits), depth, rd());
           qc::CircuitOptimizer::flattenOperations(circOne);
           if (depth != 1U || j != 0U) {
             outfile << ", ";
@@ -230,8 +229,8 @@ TEST_F(SatEncoderBenchmarking,
         for (size_t j = 0; j < 10;
              j++) { // 10 runs with same params for representative sample
           SatEncoder satEncoder;
-          auto       circOne =
-              qc::createRandomCliffordCircuit(nrOfQubits, depth, rd());
+          auto       circOne = qc::createRandomCliffordCircuit(
+              static_cast<qc::Qubit>(nrOfQubits), depth, rd());
           qc::CircuitOptimizer::flattenOperations(circOne);
           if (depth != 1U || j != 0U) {
             outfile << ", ";
@@ -287,7 +286,8 @@ TEST_F(SatEncoderBenchmarking,
         inputs.emplace_back(ipts.at(distr(gen2)));
       }
 
-      auto circOne = qc::createRandomCliffordCircuit(qubitCnt, depth, gen());
+      auto circOne = qc::createRandomCliffordCircuit(
+          static_cast<qc::Qubit>(qubitCnt), depth, gen());
       qc::CircuitOptimizer::flattenOperations(circOne);
       auto circTwo = circOne;
       if (qubitCnt != 4) {
@@ -309,8 +309,8 @@ TEST_F(SatEncoderBenchmarking,
       bool result;
       do {
         SatEncoder satEncoder1;
-        auto       circThree =
-            qc::createRandomCliffordCircuit(qubitCnt, depth, gen());
+        auto       circThree = qc::createRandomCliffordCircuit(
+            static_cast<qc::Qubit>(qubitCnt), depth, gen());
         qc::CircuitOptimizer::flattenOperations(circThree);
         auto                                       circFour = circThree;
         std::uniform_int_distribution<std::size_t> distr2(
