@@ -1,10 +1,19 @@
-//
-// Created by luca on 09/03/2022.
-//
+/*
+ * Copyright (c) 2025 Chair for Design Automation, TUM
+ * All rights reserved.
+ *
+ * SPDX-License-Identifier: MIT
+ *
+ * Licensed under the MIT License
+ */
 
-#ifndef QUSAT_STATISTICS_H
-#define QUSAT_STATISTICS_H
+#pragma once
+
+#include <cstddef>
+#include <map>
 #include <nlohmann/json.hpp>
+#include <sstream>
+#include <string>
 
 using json = nlohmann::json;
 struct Statistics {
@@ -61,4 +70,3 @@ struct Statistics {
     return this->to_json().dump(2);
   }
 };
-#endif // QUSAT_STATISTICS_H
