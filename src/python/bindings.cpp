@@ -11,23 +11,24 @@
 
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
+#include <pybind11_json/pybind11_json.hpp> // IWYU pragma: keep
 
 namespace py = pybind11;
 namespace nl = nlohmann;
 using namespace pybind11::literals;
 
-py::dict checkEquivalence(qc::QuantumComputation&         qc1,
-                          qc::QuantumComputation&         qc2,
-                          const std::vector<std::string>& inputs = {}) {
-  py::dict   results{};
-  SatEncoder encoder{};
+nl::basic_json<> checkEquivalence(qc::QuantumComputation&         qc1,
+                                  qc::QuantumComputation&         qc2,
+                                  const std::vector<std::string>& inputs = {}) {
+  nl::basic_json results{};
+  SatEncoder     encoder{};
   try {
     results["equivalent"] = encoder.testEqual(qc1, qc2, inputs);
   } catch (std::exception const& e) {
     py::print("Could not check equivalence: ", e.what());
     return {};
   }
-  results["statistics"] = encoder.getStats();
+  results["statistics"] = encoder.getStats().to_json();
   return results;
 }
 
