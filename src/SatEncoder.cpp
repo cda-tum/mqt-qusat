@@ -25,7 +25,7 @@ bool SatEncoder::testEqual(qc::QuantumComputation&         circuit,
     return false;
   }
   if (circuit.empty() || circuitTwo.empty()) {
-    std::cerr << "Both circuits must be non-empy" << std::endl;
+    std::cerr << "Both circuits must be non-empty" << std::endl;
     return false;
   }
   stats.nrOfDiffInputStates = inputs.size();
