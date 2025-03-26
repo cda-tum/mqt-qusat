@@ -297,7 +297,7 @@ environment = { CMAKE_GENERATOR = "Ninja" }
 
 
 [tool.uv]
-required-version = ">=0.6.10"
+required-version = ">=0.6.9"
 reinstall-package = ["mqt.qusat"]
 
 [tool.uv.sources]
