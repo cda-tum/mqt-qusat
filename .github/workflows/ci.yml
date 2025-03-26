@@ -40,6 +40,24 @@ jobs:
     with:
       setup-z3: true
 
+  python-tests:
+    name: 🐍 Test
+    needs: change-detection
+    if: fromJSON(needs.change-detection.outputs.run-python-tests)
+    uses: cda-tum/mqt-workflows/.github/workflows/reusable-python-ci.yml@v1.7
+
+  python-linter:
+    name: 🐍 Lint
+    needs: change-detection
+    if: fromJSON(needs.change-detection.outputs.run-python-tests)
+    uses: cda-tum/mqt-workflows/.github/workflows/reusable-python-linter.yml@v1.7
+
+  cd:
+    name: 🚀 CD
+    needs: change-detection
+    if: fromJSON(needs.change-detection.outputs.run-cd)
+    uses: cda-tum/mqt-workflows/.github/workflows/reusable-python-packaging.yml@v1.7
+
   required-checks-pass: # This job does nothing and is only used for branch protection
     name: 🚦 Check
     if: always()
@@ -48,6 +66,9 @@ jobs:
       - cpp-tests
       - cpp-linter
       - code-ql
+      - python-tests
+      - python-linter
+      - cd
     runs-on: ubuntu-latest
     steps:
       - name: Decide whether the needed jobs succeeded or failed
@@ -65,5 +86,17 @@ jobs:
             ${{
               fromJSON(needs.change-detection.outputs.run-code-ql)
               && '' || 'code-ql,'
+            }}
+            ${{
+              fromJSON(needs.change-detection.outputs.run-python-tests)
+              && '' || 'python-tests,'
+            }}
+            ${{
+              fromJSON(needs.change-detection.outputs.run-python-linter)
+              && '' || 'python-linter,'
+            }}
+            ${{
+              fromJSON(needs.change-detection.outputs.run-cd)
+              && '' || 'cd,'
             }}
           jobs: ${{ toJSON(needs) }}

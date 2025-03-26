@@ -39,10 +39,12 @@ classifiers=[
 ]
 requires-python = ">=3.9"
 dependencies = [
-    "qiskit>=1.0.0",
     "mqt.core>=3.0.0b7",
 ]
 dynamic = ["version"]
+
+[project.optional-dependencies]
+qiskit = ["qiskit[qasm3-import]>=1.0.0"]
 
 [project.urls]
 Homepage = "https://github.com/cda-tum/mqt-qusat"
@@ -133,7 +135,7 @@ report.exclude_also = [
 
 
 [tool.mypy]
-files = ["src/mqt", "noxfile.py"]
+files = ["src/mqt", "test/python", "noxfile.py"]
 mypy_path = ["$MYPY_CONFIG_FILE_DIR/src"]
 python_version = "3.9"
 warn_unused_configs = true
@@ -146,6 +148,10 @@ warn_unreachable = true
 [[tool.mypy.overrides]]
 module = ["qiskit.*"]
 ignore_missing_imports = true
+
+
+[tool.check-wheel-contents]
+ignore = ["W002"]  # Triggers on __init__.py's
 
 
 [tool.ruff]
@@ -214,6 +220,10 @@ isort.required-imports = ["from __future__ import annotations"]
 "typing.Set".msg = "Use collections.abc.Set instead."
 
 [tool.ruff.lint.per-file-ignores]
+"test/python/**" = [
+    "T20",  # allow print statements in tests
+    "PLC2701"  # allow private name imports in tests
+]
 "docs/**" = ["T20"]
 "noxfile.py" = ["T20", "TID251"]
 "*.pyi" = ["D418", "DOC202", "PYI011", "PYI021"]
@@ -244,7 +254,8 @@ lits = "lits"
 build = "cp3*"
 skip = "*-musllinux_*"
 archs = "auto64"
-test-command = "python -c \"from mqt import qusat\""
+test-groups = ["test"]
+test-command = "pytest {project}/test/python"
 test-skip = ["cp3*t-*"] # skip testing on free-threading Python until our dependencies are ready
 build-frontend = "build[uv]"
 enable = ["cpython-freethreading"]
@@ -286,7 +297,8 @@ environment = { CMAKE_GENERATOR = "Ninja" }
 
 
 [tool.uv]
-required-version = ">=0.5.20"
+required-version = ">=0.6.10"
+reinstall-package = ["mqt.qusat"]
 
 [tool.uv.sources]
 mqt-qusat = { workspace = true }
@@ -298,6 +310,12 @@ build = [
     "setuptools-scm>=8.2",
     "mqt.core>=3.0.0b7",
 ]
+test = [
+    "pytest>=8.3.5",
+    "pytest-cov>=6",
+    "qiskit[qasm3-import]>=1.0.0",
+]
 dev = [
     {include-group = "build"},
+    {include-group = "test"},
 ]
