@@ -3,7 +3,7 @@ requires = [
     "scikit-build-core>=0.11.0",
     "setuptools-scm>=8.1",
     "pybind11>=2.13.6",
-    "mqt.core>=3.0.0b7",
+    "mqt.core>=3.0.0b8",
 ]
 build-backend = "scikit_build_core.build"
 
@@ -39,7 +39,7 @@ classifiers=[
 ]
 requires-python = ">=3.9"
 dependencies = [
-    "mqt.core>=3.0.0b7",
+    "mqt.core>=3.0.0b8",
 ]
 dynamic = ["version"]
 
@@ -276,9 +276,7 @@ repair-wheel-command = [
     """auditwheel repair -w {dest_dir} {wheel} \
   --exclude libmqt-core-ir.so.3.0 \
   --exclude libmqt-core-qasm.so.3.0 \
-  --exclude libmqt-core-circuit-optimizer.so.3.0 \
-  --exclude libmqt-core-ds.so.3.0 \
-  --exclude libmqt-core-na.so.3.0""",
+  --exclude libmqt-core-circuit-optimizer.so.3.0""",
 ]
 
 [tool.cibuildwheel.macos]
@@ -290,9 +288,7 @@ before-build = "uv pip install delvewheel>=1.9.0"
 repair-wheel-command = """delvewheel repair -w {dest_dir} {wheel} --namespace-pkg mqt \
 --exclude mqt-core-ir.dll \
 --exclude mqt-core-qasm.dll \
---exclude mqt-core-circuit-optimizer.dll \
---exclude mqt-core-ds.dll \
---exclude mqt-core-na.dll"""
+--exclude mqt-core-circuit-optimizer.dll"""
 environment = { CMAKE_GENERATOR = "Ninja" }
 
 
@@ -308,7 +304,7 @@ build = [
     "pybind11>=2.13.6",
     "scikit-build-core>=0.11.0",
     "setuptools-scm>=8.2",
-    "mqt.core>=3.0.0b7",
+    "mqt.core>=3.0.0b8",
 ]
 test = [
     "pytest>=8.3.5",
