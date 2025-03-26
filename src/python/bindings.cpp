@@ -5,7 +5,6 @@
  */
 
 #include "SatEncoder.hpp"
-#include "python/qiskit/QuantumCircuit.hpp"
 
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
@@ -14,28 +13,10 @@ namespace py = pybind11;
 namespace nl = nlohmann;
 using namespace pybind11::literals;
 
-void importQuantumComputation(qc::QuantumComputation& qc,
-                              const py::object&       circ) {
-  if (py::isinstance<py::str>(circ)) {
-    auto&& file2 = circ.cast<std::string>();
-    qc.import(file2);
-  } else {
-    qc::qiskit::QuantumCircuit::import(qc, circ);
-  }
-}
-
-py::dict checkEquivalence(const py::object& circ1, const py::object& circ2,
+py::dict checkEquivalence(qc::QuantumComputation&         qc1,
+                          qc::QuantumComputation&         qc2,
                           const std::vector<std::string>& inputs = {}) {
-  qc::QuantumComputation qc1{}, qc2{};
-  py::dict               results{};
-  try {
-    importQuantumComputation(qc1, circ1);
-    importQuantumComputation(qc2, circ2);
-  } catch (std::exception const& e) {
-    py::print("Could not import circuitt: ", e.what());
-    return {};
-  }
-
+  py::dict   results{};
   SatEncoder encoder{};
   try {
     results["equivalent"] = encoder.testEqual(qc1, qc2, inputs);

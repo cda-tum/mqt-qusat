@@ -13,8 +13,10 @@ bool SatEncoder::testEqual(qc::QuantumComputation&         circuitOne,
   }
   stats.nrOfDiffInputStates = inputs.size();
   stats.nrOfQubits          = circuitOne.getNqubits();
-  qc::DAG dagOne            = qc::CircuitOptimizer::constructDAG(circuitOne);
-  qc::DAG dagTwo            = qc::CircuitOptimizer::constructDAG(circuitTwo);
+  qc::CircuitOptimizer::DAG dagOne =
+      qc::CircuitOptimizer::constructDAG(circuitOne);
+  qc::CircuitOptimizer::DAG dagTwo =
+      qc::CircuitOptimizer::constructDAG(circuitTwo);
   SatEncoder::CircuitRepresentation circOneRep =
       preprocessCircuit(dagOne, inputs);
   SatEncoder::CircuitRepresentation circTwoRep =
@@ -48,8 +50,9 @@ bool SatEncoder::checkSatisfiability(qc::QuantumComputation&         circuitOne,
   }
   stats.nrOfDiffInputStates = inputs.size();
   stats.nrOfQubits          = circuitOne.getNqubits();
-  qc::DAG     dag           = qc::CircuitOptimizer::constructDAG(circuitOne);
-  auto        circRep       = preprocessCircuit(dag, inputs);
+  qc::CircuitOptimizer::DAG dag =
+      qc::CircuitOptimizer::constructDAG(circuitOne);
+  auto        circRep = preprocessCircuit(dag, inputs);
   z3::context ctx{};
   z3::solver  solver(ctx);
   constructSatInstance(circRep, solver);
@@ -86,8 +89,8 @@ bool SatEncoder::isSatisfiable(z3::solver& solver) {
 }
 
 SatEncoder::CircuitRepresentation
-SatEncoder::preprocessCircuit(const qc::DAG&                  dag,
-                              const std::vector<std::string>& inputs) {
+SatEncoder::preprocessCircuit(const qc::CircuitOptimizer::DAG& dag,
+                              const std::vector<std::string>&  inputs) {
   auto                before     = std::chrono::high_resolution_clock::now();
   std::size_t         inputSize  = dag.size();
   std::size_t         nrOfLevels = 0;

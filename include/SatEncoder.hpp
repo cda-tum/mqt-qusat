@@ -1,8 +1,8 @@
 #pragma once
 
-#include "CircuitOptimizer.hpp"
-#include "QuantumComputation.hpp"
 #include "Statistics.hpp"
+#include "circuit_optimizer/CircuitOptimizer.hpp"
+#include "ir/QuantumComputation.hpp"
 
 #include <chrono>
 #include <iostream>
@@ -90,7 +90,8 @@ private:
   static bool isClifford(const qc::QuantumComputation& qc);
 
   SatEncoder::CircuitRepresentation
-  preprocessCircuit(const qc::DAG& dag, const std::vector<std::string>& inputs);
+  preprocessCircuit(const qc::CircuitOptimizer::DAG& dag,
+                    const std::vector<std::string>&  inputs);
 
   void constructSatInstance(
       const SatEncoder::CircuitRepresentation& circuitRepresentation,
