@@ -1,49 +1,34 @@
 /*
- * This file is part of MQT QuSAT library which is released under the MIT
- * license. See file README.md or go to
- * https://github.com/lucasberent/qsatencoder for more information.
+ * Copyright (c) 2025 Chair for Design Automation, TUM
+ * All rights reserved.
+ *
+ * SPDX-License-Identifier: MIT
+ *
+ * Licensed under the MIT License
  */
 
 #include "SatEncoder.hpp"
-#include "python/qiskit/QuantumCircuit.hpp"
 
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
+#include <pybind11_json/pybind11_json.hpp> // IWYU pragma: keep
 
 namespace py = pybind11;
 namespace nl = nlohmann;
 using namespace pybind11::literals;
 
-void importQuantumComputation(qc::QuantumComputation& qc,
-                              const py::object&       circ) {
-  if (py::isinstance<py::str>(circ)) {
-    auto&& file2 = circ.cast<std::string>();
-    qc.import(file2);
-  } else {
-    qc::qiskit::QuantumCircuit::import(qc, circ);
-  }
-}
-
-py::dict checkEquivalence(const py::object& circ1, const py::object& circ2,
-                          const std::vector<std::string>& inputs = {}) {
-  qc::QuantumComputation qc1{}, qc2{};
-  py::dict               results{};
-  try {
-    importQuantumComputation(qc1, circ1);
-    importQuantumComputation(qc2, circ2);
-  } catch (std::exception const& e) {
-    py::print("Could not import circuitt: ", e.what());
-    return {};
-  }
-
-  SatEncoder encoder{};
+nl::basic_json<> checkEquivalence(qc::QuantumComputation&         qc1,
+                                  qc::QuantumComputation&         qc2,
+                                  const std::vector<std::string>& inputs = {}) {
+  nl::basic_json results{};
+  SatEncoder     encoder{};
   try {
     results["equivalent"] = encoder.testEqual(qc1, qc2, inputs);
   } catch (std::exception const& e) {
     py::print("Could not check equivalence: ", e.what());
     return {};
   }
-  results["statistics"] = encoder.getStats();
+  results["statistics"] = encoder.getStats().to_json();
   return results;
 }
 

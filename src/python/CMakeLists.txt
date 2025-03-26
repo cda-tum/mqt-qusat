@@ -3,9 +3,19 @@ if(APPLE)
 else()
   set(BASEPOINT $ORIGIN)
 endif()
-list(APPEND CMAKE_INSTALL_RPATH ${BASEPOINT} ${BASEPOINT}/${CMAKE_INSTALL_LIBDIR})
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
+list(
+  APPEND
+  CMAKE_INSTALL_RPATH
+  ${BASEPOINT}
+  ${BASEPOINT}/${CMAKE_INSTALL_LIBDIR}
+  ${BASEPOINT}/../core/${CMAKE_INSTALL_LIBDIR}
+  ${BASEPOINT}/../core/lib
+  ${BASEPOINT}/../core/lib64
+  ${BASEPOINT}/../../core/${CMAKE_INSTALL_LIBDIR}
+  ${BASEPOINT}/../../core/lib
+  ${BASEPOINT}/../../core/lib64)
 
 pybind11_add_module(
   py${PROJECT_NAME}
@@ -16,7 +26,7 @@ pybind11_add_module(
   # Source code goes here
   bindings.cpp)
 target_compile_definitions(py${PROJECT_NAME} PRIVATE Z3_FOUND)
-target_link_libraries(py${PROJECT_NAME} PRIVATE ${PROJECT_NAME} MQT::CorePython MQT::ProjectOptions
+target_link_libraries(py${PROJECT_NAME} PRIVATE ${PROJECT_NAME} pybind11_json MQT::ProjectOptions
                                                 MQT::ProjectWarnings)
 
 # Install directive for scikit-build-core

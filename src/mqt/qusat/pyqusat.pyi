@@ -1,9 +1,8 @@
-import os
 from typing import Any
 
-from qiskit import QuantumCircuit
+from mqt.core.ir import QuantumComputation
 
 def check_equivalence(
-    circ1: str | os.PathLike[str] | QuantumCircuit,
-    circ2: str | os.PathLike[str] | QuantumCircuit,
+    circ1: QuantumComputation,
+    circ2: QuantumComputation,
 ) -> dict[str, Any]: ...

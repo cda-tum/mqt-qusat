@@ -1,5 +1,5 @@
 # set required cmake version
-cmake_minimum_required(VERSION 3.19...3.27)
+cmake_minimum_required(VERSION 3.19...3.31)
 
 project(
   qusat
@@ -22,9 +22,15 @@ if(BUILD_MQT_QUSAT_BINDINGS)
   set(Python_ARTIFACTS_INTERACTIVE
       ON
       CACHE BOOL "Prevent multiple searches for Python and instead cache the results.")
+
+  if(DISABLE_GIL)
+    message(STATUS "Disabling Python GIL")
+    add_compile_definitions(Py_GIL_DISABLED)
+  endif()
+
   # top-level call to find Python
   find_package(
-    Python 3.8 REQUIRED
+    Python 3.9 REQUIRED
     COMPONENTS Interpreter Development.Module
     OPTIONAL_COMPONENTS Development.SABIModule)
 endif()

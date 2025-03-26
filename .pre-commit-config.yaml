@@ -31,7 +31,7 @@ repos:
 
   # Handling unwanted unicode characters
   - repo: https://github.com/sirosen/texthooks
-    rev: 0.6.7
+    rev: 0.6.8
     hooks:
       - id: fix-ligatures
       - id: fix-smartquotes
@@ -46,41 +46,40 @@ repos:
 
   # Python linting using ruff
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.6.9
+    rev: v0.11.2
     hooks:
       - id: ruff
         args: ["--fix", "--show-fixes"]
-        types_or: [python, pyi, jupyter]
       - id: ruff-format
-        types_or: [python, pyi, jupyter]
 
   # Also run Black on examples in the documentation
   - repo: https://github.com/adamchainz/blacken-docs
-    rev: 1.18.0
+    rev: 1.19.1
     hooks:
       - id: blacken-docs
-        additional_dependencies: [black==23.*]
+        additional_dependencies: [black==25.*]
 
   # Check static types with mypy
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.11.2
+    rev: v1.15.0
     hooks:
       - id: mypy
-        files: ^(src/mqt)
+        files: ^(src/mqt|noxfile.py)
         args: []
         additional_dependencies:
-          - "qiskit>=0.45.0"
+          - nox
+          - pytest
+          - mqt.core>=3.0.0b8
 
   # Check for spelling
-  - repo: https://github.com/codespell-project/codespell
-    rev: v2.3.0
+  - repo: https://github.com/crate-ci/typos
+    rev: v1.30.3
     hooks:
-      - id: codespell
-        args: ["-L", "wille,linz,applys,lits", "--skip", "*.ipynb"]
+      - id: typos
 
   # Clang-format the C++ part of the code base automatically
   - repo: https://github.com/pre-commit/mirrors-clang-format
-    rev: v19.1.1
+    rev: v20.1.0
     hooks:
       - id: clang-format
         types_or: [c++, c, cuda]
@@ -93,8 +92,8 @@ repos:
         additional_dependencies: [pyyaml]
 
   # Format configuration files with prettier
-  - repo: https://github.com/pre-commit/mirrors-prettier
-    rev: v4.0.0-alpha.8
+  - repo: https://github.com/rbubley/mirrors-prettier
+    rev: v3.5.3
     hooks:
       - id: prettier
         types_or: [yaml, markdown, html, css, scss, javascript, json]

@@ -1,7 +1,12 @@
-#
-# This file is part of the JKQ QMAP library which is released under the MIT license.
-# See file README.md or go to https://github.com/lucasberent/qsatencoder for more information.
-#
+# /// script
+# requires-python = ">=3.9"
+# dependencies = [
+#     "matplotlib",
+#     "numpy",
+#     "pandas",
+#     "scipy",
+# ]
+# ///
 from __future__ import annotations
 
 import csv
@@ -13,11 +18,11 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import scipy.optimize as opt
-from mpl_toolkits.axes_grid1.inset_locator import InsetPosition, mark_inset
+from mpl_toolkits.axes_grid1.inset_locator import inset_axes, mark_inset
 
 
 def plotEC() -> None:
-    filenameEC = ""
+    filenameEC = "EC-08-03-2022.json"
 
     fig, ax = plt.subplots()
     ax.axis("tight")
@@ -55,7 +60,7 @@ def plotEC() -> None:
                 else 0,
             ]
         )
-    with Path("", "w").open() as outfile:
+    with Path("EC-08-03-2022.csv").open("w+") as outfile:
         writer = csv.writer(outfile)
         for i in range(len(rows)):
             writer.writerow(rows[i] + rows2[i])
@@ -83,14 +88,14 @@ def ConstFun(x, a, b):
 
 # preprocessing+satconstruction time in nr of qubits
 def plotScaling() -> None:
-    filenameQB = ""
-    filenameQB1 = ""
-    filenameQB2 = ""
-    filenameQB3 = ""
-    filenameCS = ""
-    filenameCS1 = ""
-    filenameCS2 = ""
-    filenameCS3 = ""
+    filenameQB = "QB-10-07-03-2022.json"
+    filenameQB1 = "QB-50-07-03-2022.json"
+    filenameQB2 = "QB-250-07-03-2022.json"
+    filenameQB3 = "QB-1000-07-03-2022.json"
+    filenameCS = "CS-5-07-03-2022.json"
+    filenameCS1 = "CS-20-07-03-2022.json"
+    filenameCS2 = "CS-65-07-03-2022.json"
+    filenameCS3 = "CS-127-07-03-2022.json"
 
     fig, ax = plt.subplots(figsize=(12, 8), layout="constrained", nrows=2, ncols=2)
     dfQB = pd.read_json(filenameQB)["benchmarks"]  # 10 depth
@@ -415,9 +420,9 @@ def constant4Fun(x, y):
 
 # preprocessing+satconstruction time in nr of qubits
 def plotGenerators() -> None:
-    filename = ""
-    filename1 = ""
-    filename2 = ""
+    filename = "G-1-07-03-2022.json"
+    filename1 = "G-2-07-03-2022.json"
+    filename2 = "G-3-07-03-2022.json"
     xData = []
     xData1 = []
     xData2 = []
@@ -479,9 +484,7 @@ def plotGenerators() -> None:
     ax.plot(xData1, QuadFun(xData1, *optimizedParameters1), color="r")
     ax.plot(xData2, QuadFun(xData2, *optimizedParameters2), color="m")
 
-    ax2 = plt.axes([0, 0, 1, 1])
-    ip = InsetPosition(ax, [0.5, 0.2, 0.3, 0.3])
-    ax2.set_axes_locator(ip)
+    ax2 = inset_axes(ax, width="30%", height="30%", loc='center right')
     mark_inset(ax, ax2, loc1=2, loc2=4, fc="none", ec="0.5")
     expData = list(range(50))
     ax.plot(

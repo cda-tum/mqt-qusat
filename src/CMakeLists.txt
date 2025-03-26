@@ -9,7 +9,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC ${PROJECT_SOURCE_DIR}/include
 # link to the MQT::Core libraries
 target_link_libraries(
   ${PROJECT_NAME}
-  PUBLIC MQT::Core nlohmann_json::nlohmann_json
+  PUBLIC MQT::CoreIR MQT::CoreCircuitOptimizer nlohmann_json::nlohmann_json
   PRIVATE MQT::ProjectOptions MQT::ProjectWarnings)
 
 # add z3 SMT solver

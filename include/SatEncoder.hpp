@@ -1,13 +1,23 @@
+/*
+ * Copyright (c) 2025 Chair for Design Automation, TUM
+ * All rights reserved.
+ *
+ * SPDX-License-Identifier: MIT
+ *
+ * Licensed under the MIT License
+ */
+
 #pragma once
 
-#include "CircuitOptimizer.hpp"
-#include "QuantumComputation.hpp"
 #include "Statistics.hpp"
+#include "circuit_optimizer/CircuitOptimizer.hpp"
+#include "ir/QuantumComputation.hpp"
 
-#include <chrono>
-#include <iostream>
-#include <locale>
+#include <cstddef>
+#include <map>
 #include <nlohmann/json.hpp>
+#include <string>
+#include <vector>
 #include <z3++.h>
 
 using json = nlohmann::json;
@@ -89,16 +99,17 @@ private:
 
   static bool isClifford(const qc::QuantumComputation& qc);
 
-  SatEncoder::CircuitRepresentation
-  preprocessCircuit(const qc::DAG& dag, const std::vector<std::string>& inputs);
+  CircuitRepresentation
+  preprocessCircuit(const qc::CircuitOptimizer::DAG& dag,
+                    const std::vector<std::string>&  inputs);
 
   void constructSatInstance(
-      const SatEncoder::CircuitRepresentation& circuitRepresentation,
+      const CircuitRepresentation& circuitRepresentation,
       z3::solver& solver); // construct z3 instance. Assumes prepocessCircuit()
                            // has been run before.
   void constructMiterInstance(
-      const SatEncoder::CircuitRepresentation& circuitOneRepresentation,
-      const SatEncoder::CircuitRepresentation& circuitTwoRepresentation,
+      const CircuitRepresentation& circuitOneRepresentation,
+      const CircuitRepresentation& circuitTwoRepresentation,
       z3::solver& solver); // assumes preprocess circuit has been run before
 
   bool isSatisfiable(z3::solver& solver);
