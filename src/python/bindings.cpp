@@ -32,6 +32,11 @@ nl::basic_json<> checkEquivalence(qc::QuantumComputation&         qc1,
   return results;
 }
 
+std::string printDIMACS(qc::QuantumComputation& qc) {
+  SatEncoder encoder{};
+  return encoder.generateDIMACS(qc);
+}
+
 PYBIND11_MODULE(pyqusat, m) {
   m.doc() =
       "Python interface for the MQT QuSAT quantum circuit satisfiability tool";
@@ -40,4 +45,8 @@ PYBIND11_MODULE(pyqusat, m) {
         "Check the equivalence of two clifford circuits for the given inputs."
         "If no inputs are given, the all zero state is used as input.",
         "circ1"_a, "circ2"_a, "inputs"_a = std::vector<std::string>());
+
+  m.def("generate_dimacs", &printDIMACS,
+        "Output the DIMACS CNF representation from Z3 of the given circuit.",
+        "circ1"_a);
 }
