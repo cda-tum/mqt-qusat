@@ -20,4 +20,4 @@ if sys.platform == "win32" and "Z3_ROOT" in os.environ:
 
 from .pyqusat import check_equivalence, generate_dimacs
 
-__all__ = ["check_equivalence","generate_dimacs"]
+__all__ = ["check_equivalence", "generate_dimacs"]

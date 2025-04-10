@@ -72,10 +72,10 @@ bool SatEncoder::checkSatisfiability(qc::QuantumComputation&         circuitOne,
 }
 
 std::string SatEncoder::generateDIMACS(qc::QuantumComputation& qc) {
-  const auto dag = qc::CircuitOptimizer::constructDAG(qc);
+  const auto                  dag  = qc::CircuitOptimizer::constructDAG(qc);
   const CircuitRepresentation circ = preprocessCircuit(dag, {});
-  z3::context ctx{};
-  z3::solver  solver(ctx);
+  z3::context                 ctx{};
+  z3::solver                  solver(ctx);
   constructSatInstance(circ, solver);
   return solver.dimacs();
 }
