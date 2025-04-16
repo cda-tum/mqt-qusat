@@ -72,24 +72,24 @@ bool SatEncoder::checkSatisfiability(qc::QuantumComputation&         circuitOne,
 }
 
 std::string SatEncoder::generateDIMACS(qc::QuantumComputation& qc) {
-    const auto dag = qc::CircuitOptimizer::constructDAG(qc);
-    const CircuitRepresentation circ = preprocessCircuit(dag, {});
+  const auto                  dag  = qc::CircuitOptimizer::constructDAG(qc);
+  const CircuitRepresentation circ = preprocessCircuit(dag, {});
 
-    z3::context ctx{};
-    z3::goal g(ctx);
-    z3::solver solver(ctx);
-    constructSatInstance(circ, solver);
+  z3::context ctx{};
+  z3::goal    g(ctx);
+  z3::solver  solver(ctx);
+  constructSatInstance(circ, solver);
 
-    for (const auto& cons : solver.assertions())
-        g.add(cons);
+  for (const auto& cons : solver.assertions())
+    g.add(cons);
 
-    z3::tactic bit_blast_tactic(ctx, "bit-blast");
-    z3::tactic tseitin_cnf_tactic(ctx, "tseitin-cnf");
-    z3::tactic combined_tactic = bit_blast_tactic & tseitin_cnf_tactic;
+  z3::tactic bit_blast_tactic(ctx, "bit-blast");
+  z3::tactic tseitin_cnf_tactic(ctx, "tseitin-cnf");
+  z3::tactic combined_tactic = bit_blast_tactic & tseitin_cnf_tactic;
 
-    z3::apply_result r = combined_tactic(g);
+  z3::apply_result r = combined_tactic(g);
 
-    return r[0].dimacs();
+  return r[0].dimacs();
 }
 
 bool SatEncoder::isSatisfiable(z3::solver& solver) {
