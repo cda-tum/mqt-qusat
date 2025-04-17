@@ -89,7 +89,7 @@ std::string SatEncoder::generateDIMACS(qc::QuantumComputation& qc) {
 
   z3::apply_result r = combined_tactic(g);
 
-  return r[0].dimacs();
+  return r[0].dimacs(false);
 }
 
 bool SatEncoder::isSatisfiable(z3::solver& solver) {
