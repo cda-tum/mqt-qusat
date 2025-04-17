@@ -87,6 +87,20 @@ TEST_F(SatEncoderTest, CheckSATConstructionWithSmallCircuit) {
   EXPECT_EQ(result, true);
 }
 
+TEST_F(SatEncoderTest, CheckDIMACSConstructionWithSmallCircuit) {
+  std::random_device rd;
+  std::mt19937       gen(rd());
+  auto               circOne = qc::createRandomCliffordCircuit(6, 1, gen());
+  qc::CircuitOptimizer::flattenOperations(circOne);
+
+  SatEncoder satEncoder;
+
+  std::string result = satEncoder.generateDIMACS(circOne);
+  std::cout << result << std::endl;
+
+  EXPECT_STRNE(result.c_str(), "");
+}
+
 /* Benchmarking */
 std::vector<std::string> getAllCompBasisStates(std::size_t nrQubits) {
   if (nrQubits == 1) {
