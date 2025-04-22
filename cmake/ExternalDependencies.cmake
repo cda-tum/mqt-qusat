@@ -1,3 +1,11 @@
+# Copyright (c) 2023 - 2025 Chair for Design Automation, TUM
+# Copyright (c) 2025 Munich Quantum Software Company GmbH
+# All rights reserved.
+#
+# SPDX-License-Identifier: MIT
+#
+# Licensed under the MIT License
+
 # Declare all external dependencies and make sure that they are available.
 
 include(FetchContent)
@@ -38,28 +46,17 @@ endif()
 # cmake-format: off
 set(MQT_CORE_VERSION 3.0.0
     CACHE STRING "MQT Core version")
-set(MQT_CORE_REV "f1f2de40b086293e093aa596e6391e94e7730d0b"
+set(MQT_CORE_REV "9b6e01482cc77f48c828d988407ee4f8e4e93b56"
     CACHE STRING "MQT Core identifier (tag, branch or commit hash)")
-set(MQT_CORE_REPO_OWNER "cda-tum"
+set(MQT_CORE_REPO_OWNER "munich-quantum-toolkit"
     CACHE STRING "MQT Core repository owner (change when using a fork)")
 # cmake-format: on
-if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.24)
-  FetchContent_Declare(
-    mqt-core
-    GIT_REPOSITORY https://github.com/${MQT_CORE_REPO_OWNER}/mqt-core.git
-    GIT_TAG ${MQT_CORE_REV}
-    FIND_PACKAGE_ARGS ${MQT_CORE_VERSION})
-  list(APPEND FETCH_PACKAGES mqt-core)
-else()
-  find_package(mqt-core ${MQT_CORE_VERSION} QUIET)
-  if(NOT mqt-core_FOUND)
-    FetchContent_Declare(
-      mqt-core
-      GIT_REPOSITORY https://github.com/${MQT_CORE_REPO_OWNER}/mqt-core.git
-      GIT_TAG ${MQT_CORE_REV})
-    list(APPEND FETCH_PACKAGES mqt-core)
-  endif()
-endif()
+FetchContent_Declare(
+  mqt-core
+  GIT_REPOSITORY https://github.com/${MQT_CORE_REPO_OWNER}/core.git
+  GIT_TAG ${MQT_CORE_REV}
+  FIND_PACKAGE_ARGS ${MQT_CORE_VERSION})
+list(APPEND FETCH_PACKAGES mqt-core)
 
 if(BUILD_MQT_QUSAT_TESTS)
   set(gtest_force_shared_crt
@@ -69,33 +66,17 @@ if(BUILD_MQT_QUSAT_TESTS)
       1.16.0
       CACHE STRING "Google Test version")
   set(GTEST_URL https://github.com/google/googletest/archive/refs/tags/v${GTEST_VERSION}.tar.gz)
-  if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.24)
-    FetchContent_Declare(googletest URL ${GTEST_URL} FIND_PACKAGE_ARGS ${GTEST_VERSION} NAMES GTest)
-    list(APPEND FETCH_PACKAGES googletest)
-  else()
-    find_package(googletest ${GTEST_VERSION} QUIET NAMES GTest)
-    if(NOT googletest_FOUND)
-      FetchContent_Declare(googletest URL ${GTEST_URL})
-      list(APPEND FETCH_PACKAGES googletest)
-    endif()
-  endif()
+  FetchContent_Declare(googletest URL ${GTEST_URL} FIND_PACKAGE_ARGS ${GTEST_VERSION} NAMES GTest)
+  list(APPEND FETCH_PACKAGES googletest)
 endif()
 
 if(BUILD_MQT_QUSAT_BINDINGS)
   # add pybind11_json library
-  if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.24)
-    FetchContent_Declare(
-      pybind11_json
-      GIT_REPOSITORY https://github.com/pybind/pybind11_json
-      FIND_PACKAGE_ARGS)
-    list(APPEND FETCH_PACKAGES pybind11_json)
-  else()
-    find_package(pybind11_json QUIET)
-    if(NOT pybind11_json_FOUND)
-      FetchContent_Declare(pybind11_json GIT_REPOSITORY https://github.com/pybind/pybind11_json)
-      list(APPEND FETCH_PACKAGES pybind11_json)
-    endif()
-  endif()
+  FetchContent_Declare(
+    pybind11_json
+    GIT_REPOSITORY https://github.com/pybind/pybind11_json
+    FIND_PACKAGE_ARGS)
+  list(APPEND FETCH_PACKAGES pybind11_json)
 endif()
 
 # Make all declared dependencies available.

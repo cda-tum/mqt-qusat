@@ -1,3 +1,11 @@
+# Copyright (c) 2023 - 2025 Chair for Design Automation, TUM
+# Copyright (c) 2025 Munich Quantum Software Company GmbH
+# All rights reserved.
+#
+# SPDX-License-Identifier: MIT
+#
+# Licensed under the MIT License
+
 # main project library
 add_library(${PROJECT_NAME} ${PROJECT_SOURCE_DIR}/include/SatEncoder.hpp
                             ${PROJECT_SOURCE_DIR}/include/Statistics.hpp SatEncoder.cpp)
