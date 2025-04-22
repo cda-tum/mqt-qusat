@@ -3,7 +3,7 @@ requires = [
     "scikit-build-core>=0.11.0",
     "setuptools-scm>=8.1",
     "pybind11>=2.13.6",
-    "mqt.core>=3.0.0b8",
+    "mqt.core>=3.0.2",
 ]
 build-backend = "scikit_build_core.build"
 
@@ -39,7 +39,7 @@ classifiers=[
 ]
 requires-python = ">=3.9"
 dependencies = [
-    "mqt.core>=3.0.0b8",
+    "mqt.core>=3.0.2",
 ]
 dynamic = ["version"]
 
@@ -304,7 +304,7 @@ build = [
     "pybind11>=2.13.6",
     "scikit-build-core>=0.11.0",
     "setuptools-scm>=8.2",
-    "mqt.core>=3.0.0b8",
+    "mqt.core>=3.0.2",
 ]
 test = [
     "pytest>=8.3.5",
