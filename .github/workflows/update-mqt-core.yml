@@ -23,4 +23,4 @@ jobs:
     name: ⬆️ Update MQT Core
     uses: munich-quantum-toolkit/workflows/.github/workflows/reusable-mqt-core-update.yml@v1.8
     with:
-      update-to-head: ${{ fromJSON(github.event.inputs.update-to-head) || false }}
+      update-to-head: ${{ github.event.inputs.update-to-head == 'true' }}
