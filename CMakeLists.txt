@@ -7,7 +7,7 @@
 # Licensed under the MIT License
 
 # set required cmake version
-cmake_minimum_required(VERSION 3.19...3.31)
+cmake_minimum_required(VERSION 3.24...4.0)
 
 project(
   qusat
@@ -37,10 +37,7 @@ if(BUILD_MQT_QUSAT_BINDINGS)
   endif()
 
   # top-level call to find Python
-  find_package(
-    Python 3.9 REQUIRED
-    COMPONENTS Interpreter Development.Module
-    OPTIONAL_COMPONENTS Development.SABIModule)
+  find_package(Python 3.9 REQUIRED COMPONENTS Interpreter Development.Module)
 endif()
 
 # Add path for custom modules
