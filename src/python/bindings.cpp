@@ -48,5 +48,5 @@ PYBIND11_MODULE(pyqusat, m) {
 
   m.def("generate_dimacs", &printDIMACS,
         "Output the DIMACS CNF representation from Z3 of the given circuit.",
-        "circ1"_a);
+        "circ"_a);
 }

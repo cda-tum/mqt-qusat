@@ -7,5 +7,5 @@ def check_equivalence(
     circ2: QuantumComputation,
 ) -> dict[str, Any]: ...
 def generate_dimacs(
-    circ1: QuantumComputation,
+    circ: QuantumComputation,
 ) -> str: ...
