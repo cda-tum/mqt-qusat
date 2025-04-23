@@ -14,3 +14,6 @@ def check_equivalence(
     circ1: QuantumComputation,
     circ2: QuantumComputation,
 ) -> dict[str, Any]: ...
+def generate_dimacs(
+    circ: QuantumComputation,
+) -> str: ...

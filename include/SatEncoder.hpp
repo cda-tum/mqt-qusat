@@ -66,6 +66,13 @@ public:
    */
   bool checkSatisfiability(qc::QuantumComputation& circuitOne);
 
+  /**
+   * Output the DIMACS CNF representation from Z3 of the given circuit.
+   * @param circuit circuit to construct SAT instance for
+   * @return The DIMACS CNF representation of circuit
+   */
+  std::string generateDIMACS(qc::QuantumComputation& circuit);
+
   [[nodiscard]] json              to_json() const { return stats.to_json(); }
   [[nodiscard]] const Statistics& getStats() const;
 
