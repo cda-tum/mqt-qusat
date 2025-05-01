@@ -44,7 +44,7 @@ if(BUILD_MQT_QUSAT_BINDINGS)
 endif()
 
 # cmake-format: off
-set(MQT_CORE_VERSION 3.0.0
+set(MQT_CORE_VERSION 3.0.2
     CACHE STRING "MQT Core version")
 set(MQT_CORE_REV "9b6e01482cc77f48c828d988407ee4f8e4e93b56"
     CACHE STRING "MQT Core identifier (tag, branch or commit hash)")
