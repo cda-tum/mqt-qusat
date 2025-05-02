@@ -6,11 +6,7 @@
 #
 # Licensed under the MIT License
 
-"""MQT QuSAT library.
-
-This file is part of the MQT QuSAT library released under the MIT license.
-See README.md or go to https://github.com/cda-tum/mqt-qusat for more information.
-"""
+"""MQT QuSAT library."""
 
 from __future__ import annotations
 
