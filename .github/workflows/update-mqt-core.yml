@@ -14,10 +14,6 @@ on:
     paths:
       - .github/workflows/update-mqt-core.yml
 
-permissions:
-  contents: read
-  pull-requests: write
-
 concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
   cancel-in-progress: true
@@ -26,5 +22,7 @@ jobs:
   update-mqt-core:
     name: ⬆️ Update MQT Core
     uses: munich-quantum-toolkit/workflows/.github/workflows/reusable-mqt-core-update.yml@v1.9
+    permissions:
+      contents: write
     with:
       update-to-head: ${{ github.event.inputs.update-to-head == 'true' }}
