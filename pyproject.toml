@@ -289,7 +289,6 @@ repair-wheel-command = """delvewheel repair -w {dest_dir} {wheel} --namespace-pk
 --exclude mqt-core-ir.dll \
 --exclude mqt-core-qasm.dll \
 --exclude mqt-core-circuit-optimizer.dll"""
-environment = { CMAKE_GENERATOR = "Ninja" }
 
 
 [tool.uv]
