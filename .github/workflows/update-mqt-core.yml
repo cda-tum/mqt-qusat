@@ -24,5 +24,6 @@ jobs:
     uses: munich-quantum-toolkit/workflows/.github/workflows/reusable-mqt-core-update.yml@v1.9
     permissions:
       contents: write
+      pull-requests: write
     with:
       update-to-head: ${{ github.event.inputs.update-to-head == 'true' }}
